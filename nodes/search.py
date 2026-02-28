@@ -1,6 +1,6 @@
 import ollama
 import wikipediaapi
-import wikipedia  # pip install wikipedia
+import wikipedia
 from agent_state import AgentState
 
 wiki_wiki = wikipediaapi.Wikipedia(
@@ -16,8 +16,7 @@ def get_best_title(query: str, candidates: list) -> str:
     {chr(10).join(f"{i+1}. {title}" for i, title in enumerate(candidates))}
     
     Your job is to pick the MOST SPECIFIC and RELEVANT title for the query.
-    Avoid picking broad or generic titles when more specific options are available.
-    For example, prefer a specific subtopic over a broad parent topic.
+    If a title exactly matches the user's query, prioritise that above all others.
     
     Reply with ONLY the exact title from the list, nothing else.
     No explanation, no punctuation, just the title.
@@ -37,25 +36,25 @@ def search_node(state: AgentState) -> AgentState:
     candidates = wikipedia.search(query, results=20)
     
     if not candidates:
-        print("❌ No Wikipedia results found at all.")
+        print("\nNo Wikipedia results found at all.")
         state['search_results'] = ["No results found."]
         return state
     
-    print(f"📋 Found {len(candidates)} candidates: {candidates}")
+    print(f"\nFound {len(candidates)} candidates: {candidates}")
     
     # Step 2 — Ask LLM to pick the best one
     best_title = get_best_title(query, candidates)
-    print(f"🤖 LLM picked: '{best_title}'")
+    print(f"\nLLM picked: '{best_title}'")
     
     # Step 3 — Fetch that page
     page = wiki_wiki.page(best_title)
     
     if page.exists():
-        print(f"📖 Page found!")
+        print(f"\nPage found!")
         state['search_results'] = [page.text[:3000]]
     else:
         # Fallback — just use the first candidate
-        print(f"⚠️ LLM pick not found, using first candidate: '{candidates[0]}'")
+        print(f"\nLLM pick not found, using first candidate: '{candidates[0]}'")
         page = wiki_wiki.page(candidates[0])
         if page.exists():
             state['search_results'] = [page.text[:3000]]

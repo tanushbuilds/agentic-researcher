@@ -3,6 +3,10 @@ from nodes.search import search_node
 from nodes.router import router_node
 from nodes.extractor import extraction_node
 from nodes.reporter import report_node
+from nodes.duckduckgo import duckduckgo_node
+from nodes.tool_selector import tool_selector_node
+from nodes.query_rewriter import query_rewriter_node
+
 
 MAX_RETRIES = 3
 
@@ -12,26 +16,57 @@ state = AgentState(
     extracted_notes="",
     final_report="",
     should_continue=False,
-    retry_count=0
+    retry_count=0,
+    search_source="",
+    selected_tool=""
 )
 
-# Search loop with router deciding
+original_query = state["query"]
+
+# Step 1 — LLM selects the tool
+state = tool_selector_node(state)
+primary_tool = state["selected_tool"]
+fallback_tool = "duckduckgo" if primary_tool == "wikipedia" else "wikipedia"
+
+# Step 2 — helper to run the right search node
+def run_search(state, tool):
+    if tool == "wikipedia":
+        return search_node(state)
+    else:
+        return duckduckgo_node(state)
+
+# Step 3 — try primary tool
+print(f"\nPrimary tool: {primary_tool}...")
 while state["retry_count"] < MAX_RETRIES:
-    state = search_node(state)
+    state = run_search(state, primary_tool)
     state = router_node(state)
 
     if state["should_continue"]:
-        print("Good results found! Moving on...")
+        print(f"\n{primary_tool.title()} results good! Moving on...")
         break
     else:
         state["retry_count"] += 1
-        print(f"Results not good enough. Retry {state['retry_count']}/{MAX_RETRIES}...")
+        print(f"\n{primary_tool.title()} retry {state['retry_count']}/{MAX_RETRIES}...")
         if state["retry_count"] < MAX_RETRIES:
-            state["query"] = state["query"] + " overview"  # slightly modify query to try again
+            state = query_rewriter_node(state)
+            print(f"Enhanced query: {state["query"]}")
 
-# Run extract and report regardless after loop
+# Step 4 — fall back to other tool if primary failed
+if not state["should_continue"]:
+    print(f"\nFalling back to {fallback_tool}...")
+    state["query"] = original_query
+    state["retry_count"] = 0
+    state = run_search(state, fallback_tool)
+    state = router_node(state)
+
+    if state["should_continue"]:
+        print(f"\n{fallback_tool.title()} results good! Moving on...")
+    else:
+        print("\nBoth tools struggled, proceeding with what we have...")
+
+# Step 5 — extract and report
 state = extraction_node(state)
 state = report_node(state)
 
-print("=== FINAL REPORT ===")
-print(state["final_report"][:1000])
+print(f"\n=== FINAL REPORT (source: {state['search_source']}) ===")
+print(f"\n{state["final_report"]}")
