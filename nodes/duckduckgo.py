@@ -10,8 +10,8 @@ def duckduckgo_node(state: AgentState) -> AgentState:
         
         if not results:
             print("\nDuckDuckGo found nothing.")
-            state['search_results'] = ["No results found."]
-            state['search_source'] = "duckduckgo"
+            state['duckduckgo_results'] = ["No results found."]
+            state['duckduckgo_results'] = "duckduckgo"
             return state
         
         # Combine the body text from top results
@@ -21,12 +21,12 @@ def duckduckgo_node(state: AgentState) -> AgentState:
         ])
         
         print(f"\nDuckDuckGo found {len(results)} results!")
-        state['search_results'] = [combined]
+        state['duckduckgo_results'] = [combined]
         state['search_source'] = "duckduckgo"
     
     except Exception as e:
         print(f"\nDuckDuckGo error: {e}")
-        state['search_results'] = ["No results found."]
+        state['duckduckgo_results'] = ["No results found."]
         state['search_source'] = "duckduckgo"
     
     return state

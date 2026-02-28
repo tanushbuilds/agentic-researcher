@@ -21,8 +21,13 @@ def tool_selector_node(state: AgentState) -> AgentState:
     - Technology products or tools
     - Trending topics
     - Example: "Latest AI Trends", "How to use Claude AI", "Best Python libraries 2026"
+
+    BOTH is better when:
+    - The topic has both a rich historical background AND recent developments
+    - The topic is a living person, ongoing event, or evolving technology
+    - You need both foundational knowledge and current information
     
-    Reply with ONLY one word: WIKIPEDIA or DUCKDUCKGO
+    Reply with ONLY one word: WIKIPEDIA, DUCKDUCKGO or BOTH
     """
 
     response = ollama.chat(
@@ -32,11 +37,16 @@ def tool_selector_node(state: AgentState) -> AgentState:
 
     tool = response["message"]["content"].strip().upper()
 
-    if "DUCKDUCKGO" in tool:
+    if "BOTH" in tool:
+        state['selected_tool'] = "both"
+        print("\nTool selected: Both")
+    elif "DUCKDUCKGO" in tool:
         state['selected_tool'] = "duckduckgo"
         print("\nTool selected: DuckDuckGo")
     else:
         state['selected_tool'] = "wikipedia"
         print("\nTool selected: Wikipedia")
+
+
 
     return state

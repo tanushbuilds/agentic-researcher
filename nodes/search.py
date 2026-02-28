@@ -37,7 +37,7 @@ def search_node(state: AgentState) -> AgentState:
     
     if not candidates:
         print("\nNo Wikipedia results found at all.")
-        state['search_results'] = ["No results found."]
+        state['wikipedia_results'] = ["No results found."]
         return state
     
     print(f"\nFound {len(candidates)} candidates: {candidates}")
@@ -51,14 +51,14 @@ def search_node(state: AgentState) -> AgentState:
     
     if page.exists():
         print(f"\nPage found!")
-        state['search_results'] = [page.text[:3000]]
+        state['wikipedia_results'] = [page.text[:3000]]
     else:
         # Fallback — just use the first candidate
         print(f"\nLLM pick not found, using first candidate: '{candidates[0]}'")
         page = wiki_wiki.page(candidates[0])
         if page.exists():
-            state['search_results'] = [page.text[:3000]]
+            state['wikipedia_results'] = [page.text[:3000]]
         else:
-            state['search_results'] = ["No results found."]
+            state['wikipedia_results'] = ["No results found."]
     
     return state
