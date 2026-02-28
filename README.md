@@ -1,19 +1,21 @@
-# Agentic Researcher
+# 🔍 Agentic Researcher
 
-A locally-running multi-node research agent powered by Mistral via Ollama. Give it any topic and it searches, judges, rewrites, and generates a full structured research report — entirely on your own machine.
+A locally-running multi-node research agent powered by Mistral via Ollama. Give it any topic and it intelligently selects tools, searches, judges quality, rewrites failed queries, combines multiple sources, and generates a full structured research report — entirely on your own machine.
 
 ---
 
 ## How It Works
 
 ```
-User Query → Tool Selector → Search (Wikipedia / DuckDuckGo) → Router
-                                        ↓ bad results
-                                  Query Rewriter → Retry
-                                        ↓ still failing
-                                  Fallback to other tool
-                                        ↓
-                             Extractor → Reporter → Final Report
+User Query → Tool Selector → Wikipedia ──────────────────┐
+                          → DuckDuckGo ─────────────────┤
+                          → Both ──→ Combiner ───────────┴→ Router
+                                                              ↓ bad results
+                                                       Query Rewriter → Retry
+                                                              ↓ still failing
+                                                       Fallback to other tool
+                                                              ↓
+                                                    Extractor → Reporter → Final Report
 ```
 
 ---
@@ -22,9 +24,10 @@ User Query → Tool Selector → Search (Wikipedia / DuckDuckGo) → Router
 
 | Node | File | What it does |
 |---|---|---|
-| Tool Selector | `nodes/tool_selector.py` | LLM decides whether to use Wikipedia or DuckDuckGo |
+| Tool Selector | `nodes/tool_selector.py` | LLM decides: Wikipedia, DuckDuckGo, or Both |
 | Search | `nodes/search.py` | Fetches Wikipedia page using LLM-based candidate matching |
 | DuckDuckGo | `nodes/duckduckgo.py` | Searches the web for recent or practical topics |
+| Combiner | `nodes/combiner.py` | Merges Wikipedia and DuckDuckGo results into one source |
 | Router | `nodes/router.py` | Judges if search results are good enough to proceed |
 | Query Rewriter | `nodes/query_rewriter.py` | LLM rewrites a failed query to get better results |
 | Extractor | `nodes/extractor.py` | Extracts key points from search results |
@@ -68,12 +71,14 @@ python main.py
 ## Example
 
 ```
-Enter your research topic: How to master Claude AI
+Enter your research topic: Cristiano Ronaldo
+How long should the report be? 500
 
-Tool selected: DuckDuckGo
-DuckDuckGo results good! Moving on...
+Tool selected: Both
+Searching both tools...
+Combined Wikipedia and DuckDuckGo results!
 
-=== FINAL REPORT (source: duckduckgo) ===
+=== FINAL REPORT (source: wikipedia + duckduckgo) ===
 ...
 ```
 
@@ -92,8 +97,7 @@ DuckDuckGo results good! Moving on...
 ## Roadmap
 
 - [ ] Memory across sessions
-- [ ] LangGraph implementation
-- [ ] Multi-source search synthesis
+- [ ] LangGraph implementation  
 - [ ] Web UI
 
 ---
