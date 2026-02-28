@@ -69,7 +69,6 @@ python main.py
 
 ```
 Enter your research topic: How to master Claude AI
-How long should the report be? 500
 
 Tool selected: DuckDuckGo
 DuckDuckGo results good! Moving on...
@@ -99,4 +98,4 @@ DuckDuckGo results good! Moving on...
 
 ---
 
-<sub>Built by [@tanushbuilds](https://github.com/tanushbuilds) · 14 year old developer from India</sub>
+<sub>Built by [@tanushbuilds](https://github.com/tanushbuilds) · 14 year old developer</sub>
