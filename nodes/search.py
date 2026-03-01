@@ -10,16 +10,20 @@ wiki_wiki = wikipediaapi.Wikipedia(
 
 def get_best_title(query: str, candidates: list) -> str:
     prompt = f"""
+    You are a Wikipedia title selector.
     A user wants to research: "{query}"
-    
-    Here are Wikipedia page titles related to this topic:
+
+    Here are the ONLY available Wikipedia page titles to choose from:
     {chr(10).join(f"{i+1}. {title}" for i, title in enumerate(candidates))}
-    
-    Your job is to pick the MOST SPECIFIC and RELEVANT title for the query.
-    If a title exactly matches the user's query, prioritise that above all others.
-    
-    Reply with ONLY the exact title from the list, nothing else.
-    No explanation, no punctuation, just the title.
+
+    Rules:
+    - You MUST pick exactly ONE title from the list above
+    - Do NOT invent or combine titles
+    - If a title exactly matches the query, pick that one
+    - Otherwise pick the MOST SPECIFIC and RELEVANT title from the list
+    - If no title is relevant, pick the closest match
+
+    Reply with ONLY the exact title as it appears in the list above, nothing else.
     """
     
     response = ollama.chat(
@@ -51,13 +55,13 @@ def search_node(state: AgentState) -> AgentState:
     
     if page.exists():
         print(f"\nPage found!")
-        state['wikipedia_results'] = [page.text[:3000]]
+        state['wikipedia_results'] = [page.text[:750]]
     else:
         # Fallback — just use the first candidate
         print(f"\nLLM pick not found, using first candidate: '{candidates[0]}'")
         page = wiki_wiki.page(candidates[0])
         if page.exists():
-            state['wikipedia_results'] = [page.text[:3000]]
+            state['wikipedia_results'] = [page.text[:750]]
         else:
             state['wikipedia_results'] = ["No results found."]
     

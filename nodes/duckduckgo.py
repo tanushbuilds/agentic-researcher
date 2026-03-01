@@ -11,16 +11,16 @@ def duckduckgo_node(state: AgentState) -> AgentState:
         if not results:
             print("\nDuckDuckGo found nothing.")
             state['duckduckgo_results'] = ["No results found."]
-            state['duckduckgo_results'] = "duckduckgo"
             return state
         
         # Combine the body text from top results
         combined = "\n\n".join([
-            f"Source: {r['href']}\n{r['body']}"
+            f"Source: {r['href']}\n{r['body'][:150]}"
             for r in results if r.get('body')
         ])
         
         print(f"\nDuckDuckGo found {len(results)} results!")
+        print(combined)
         state['duckduckgo_results'] = [combined]
         state['search_source'] = "duckduckgo"
     
