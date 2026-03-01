@@ -6,33 +6,52 @@ A locally-running multi-node research agent powered by Mistral via Ollama. Give 
 
 ## How It Works
 
-```
-User Query → Memory Check ──→ Match Found? → Skip Search → Report
-                ↓ No Match
-        Query Classifier
-                ↓
-        SIMPLE ─────────────────────────────────────────────────────┐
-                ↓                                                    │
-        COMPLEX → Planner → Sub-queries                             │
-                                ↓                                    │
-                    For each sub-query:                              │
-                    Tool Selector → Wikipedia ──┐                    │
-                                 → DuckDuckGo ─┤                    │
-                                 → Both ────────┴→ Combiner          │
-                                                    ↓                │
-                                                  Router             │
-                                                    ↓ bad results    │
-                                             Query Rewriter → Retry  │
-                                                    ↓ still failing  │
-                                             Fallback to other tool  │
-                                                    ↓                │
-                                                Extractor            │
-                                                    ↓                │
-                                              Synthesiser ───────────┤
-                                                                     ↓
-                                                            Reporter → Final Report
-                                                                     ↓
-                                                               Save to Memory
+```mermaid
+flowchart TD
+    A([🔍 User Query]) --> B[read_memory]
+    B -->|Match Found| C[report_node]
+    C --> D[reflector_node]
+    D -->|Approved| E([📄 Final Report])
+    B -->|No Match| F[query_classifier]
+
+    F -->|SIMPLE| G[tool_selector]
+    F -->|COMPLEX| H[planner_node]
+
+    H --> I[Sub-queries Loop]
+    I --> G
+
+    G -->|Wikipedia| J[search_node]
+    G -->|DuckDuckGo| K[duckduckgo_node]
+    G -->|Both| J & K --> L[combiner_node]
+
+    J --> M[router_node]
+    K --> M
+    L --> M
+
+    M -->|Good| N[extraction_node]
+    M -->|Bad| O[query_rewriter_node]
+    O --> G
+
+    M -->|Max Retries| P[fallback to other tool]
+    P --> M
+
+    N -->|Simple| Q[report_node]
+    N -->|Complex| R[synthesiser_node]
+    R --> Q
+
+    Q --> S[reflector_node]
+    S -->|Approved| T[write_memory]
+    T --> E
+    S -->|Rejected| U{Max Reflections?}
+    U -->|No| G
+    U -->|Yes| T
+
+    style A fill:#6366f1,color:#fff
+    style E fill:#22c55e,color:#fff
+    style H fill:#f59e0b,color:#fff
+    style L fill:#3b82f6,color:#fff
+    style R fill:#8b5cf6,color:#fff
+    style T fill:#10b981,color:#fff
 ```
 
 ---
