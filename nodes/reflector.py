@@ -6,7 +6,7 @@ def reflector_node(state: AgentState) -> AgentState:
 
     try:
         prompt = f"""
-        You are a research assistant.
+        You are a research quality checker.
 
         User's research query: {state["query"]}
 

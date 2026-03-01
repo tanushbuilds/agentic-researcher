@@ -5,7 +5,7 @@ def query_classifier_node(state: AgentState) -> AgentState:
     
     try:
         prompt = f"""
-        You are a research assistant.
+        You are a query complexity analyser.
         Your job is to detect if the user's research query is COMPLEX or SIMPLE.
         Research Query: {state["query"]}
         Reply with ONLY one word: COMPLEX or SIMPLE

@@ -38,7 +38,7 @@ def read_memory(state: AgentState) -> AgentState:
                 previous_queries = [memory[i]["query"] for i in memory]
 
                 prompt = f"""
-                You are a research assistant.
+                You are a topic similarity detector.
 
                 Current query: {state["query"]}
 

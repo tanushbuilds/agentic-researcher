@@ -6,7 +6,7 @@ def report_node(state: AgentState) -> AgentState:
 
     try:
         prompt = f"""
-        You are a research assistant.
+        You are a professional research report writer.
         Write a full, structured research report based on the following notes:
 
         {notes}

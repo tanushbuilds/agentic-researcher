@@ -7,6 +7,7 @@ def tool_selector_node(state: AgentState) -> AgentState:
     try:
 
         prompt = f"""
+        You are a search strategy expert.
         You are deciding which search tool to use for a research query.
         
         Query: "{query}"
