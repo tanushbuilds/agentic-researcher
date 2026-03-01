@@ -1,21 +1,38 @@
-# 🔍 Agentic Researcher
+# 🔍 Agentic Research Assistant
 
-A locally-running multi-node research agent powered by Mistral via Ollama. Give it any topic and it intelligently selects tools, searches, judges quality, rewrites failed queries, combines multiple sources, and generates a full structured research report — entirely on your own machine.
+A locally-running multi-node research agent powered by Mistral via Ollama. Give it any topic and it intelligently classifies complexity, selects tools, searches multiple sources, rewrites failed queries, remembers past research, and generates a full structured report — entirely on your own machine.
 
 ---
 
 ## How It Works
 
 ```
-User Query → Tool Selector → Wikipedia ──────────────────┐
-                          → DuckDuckGo ─────────────────┤
-                          → Both ──→ Combiner ───────────┴→ Router
-                                                              ↓ bad results
-                                                       Query Rewriter → Retry
-                                                              ↓ still failing
-                                                       Fallback to other tool
-                                                              ↓
-                                                    Extractor → Reporter → Final Report
+User Query → Memory Check ──→ Match Found? → Skip Search → Report
+                ↓ No Match
+        Query Classifier
+                ↓
+        SIMPLE ─────────────────────────────────────────────────────┐
+                ↓                                                    │
+        COMPLEX → Planner → Sub-queries                             │
+                                ↓                                    │
+                    For each sub-query:                              │
+                    Tool Selector → Wikipedia ──┐                    │
+                                 → DuckDuckGo ─┤                    │
+                                 → Both ────────┴→ Combiner          │
+                                                    ↓                │
+                                                  Router             │
+                                                    ↓ bad results    │
+                                             Query Rewriter → Retry  │
+                                                    ↓ still failing  │
+                                             Fallback to other tool  │
+                                                    ↓                │
+                                                Extractor            │
+                                                    ↓                │
+                                              Synthesiser ───────────┤
+                                                                     ↓
+                                                            Reporter → Final Report
+                                                                     ↓
+                                                               Save to Memory
 ```
 
 ---
@@ -24,14 +41,19 @@ User Query → Tool Selector → Wikipedia ────────────�
 
 | Node | File | What it does |
 |---|---|---|
+| Memory (Read) | `nodes/memory.py` | Checks if query matches past research — skips search if yes |
+| Query Classifier | `nodes/query_classifier.py` | LLM detects if query is SIMPLE or COMPLEX |
+| Planner | `nodes/planner.py` | Breaks complex queries into 3 focused sub-queries |
 | Tool Selector | `nodes/tool_selector.py` | LLM decides: Wikipedia, DuckDuckGo, or Both |
 | Search | `nodes/search.py` | Fetches Wikipedia page using LLM-based candidate matching |
 | DuckDuckGo | `nodes/duckduckgo.py` | Searches the web for recent or practical topics |
 | Combiner | `nodes/combiner.py` | Merges Wikipedia and DuckDuckGo results into one source |
 | Router | `nodes/router.py` | Judges if search results are good enough to proceed |
 | Query Rewriter | `nodes/query_rewriter.py` | LLM rewrites a failed query to get better results |
-| Extractor | `nodes/extractor.py` | Extracts key points from search results |
+| Extractor | `nodes/extractor.py` | Extracts key facts from search results |
+| Synthesiser | `nodes/synthesiser.py` | Combines findings from all sub-queries into unified notes |
 | Reporter | `nodes/reporter.py` | Writes a full structured research report |
+| Memory (Write) | `nodes/memory.py` | Saves query + notes to memory.json for future sessions |
 
 ---
 
@@ -47,8 +69,8 @@ User Query → Tool Selector → Wikipedia ────────────�
 
 **1. Clone the repo**
 ```bash
-git clone https://github.com/tanushbuilds/agentic-researcher.git
-cd agentic-researcher
+git clone https://github.com/tanushbuilds/agentic-research-assistant.git
+cd agentic-research-assistant
 ```
 
 **2. Install dependencies**
@@ -71,16 +93,43 @@ python main.py
 ## Example
 
 ```
-Enter your research topic: Cristiano Ronaldo
-How long should the report be? 500
+Enter your research topic: Compare careers of Cristiano Ronaldo and Lionel Messi
+
+Query Complexity: COMPLEX
+Sub-queries: ['Ronaldo career stats', 'Messi career stats', 'Compare Ronaldo Messi careers']
 
 Tool selected: Both
 Searching both tools...
 Combined Wikipedia and DuckDuckGo results!
 
-=== FINAL REPORT (source: wikipedia + duckduckgo) ===
+[repeats for each sub-query]
+
+Memory saved for: 'Compare careers of Cristiano Ronaldo and Lionel Messi'
+
+=== FINAL REPORT ===
 ...
+
+--- Second run ---
+
+Enter your research topic: Ronaldo vs Messi
+Memory match found: 'Compare careers of Cristiano Ronaldo and Lionel Messi'! Skipping search...
 ```
+
+---
+
+## Agentic Features
+
+| Feature | Status |
+|---|---|
+| LLM-based tool selection | ✅ |
+| Multi-source search + combining | ✅ |
+| Result quality judgement | ✅ |
+| Query rewriting on failure | ✅ |
+| Fallback between tools | ✅ |
+| Complexity detection | ✅ |
+| Plan and Execute pattern | ✅ |
+| Semantic memory across sessions | ✅ |
+| Error handling with fallbacks | ✅ |
 
 ---
 
@@ -96,9 +145,9 @@ Combined Wikipedia and DuckDuckGo results!
 
 ## Roadmap
 
-- [ ] Memory across sessions
-- [ ] LangGraph implementation  
-- [ ] Web UI
+- [ ] Report quality self-reflection
+- [ ] LangGraph implementation
+- [ ] Django web UI
 
 ---
 
