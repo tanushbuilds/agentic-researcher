@@ -42,3 +42,6 @@ ollama/models/
 # Temporary files
 *.tmp
 *.swp
+
+# Memory files
+memory.json
