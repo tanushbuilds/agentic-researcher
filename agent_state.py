@@ -12,6 +12,8 @@ class AgentState(TypedDict):
     search_results: List[str]
     extracted_notes: str
     final_report: str
+    report_approved: bool
+    reflection_count: int
     should_continue: bool
     retry_count: int
-    search_source: str  # tracks which tool was used
+    search_source: str

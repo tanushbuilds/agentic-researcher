@@ -11,9 +11,11 @@ from nodes.query_classifier import query_classifier_node
 from nodes.planner import planner_node
 from nodes.synthesiser import synthesiser_node
 from nodes.memory import read_memory, write_memory
+from nodes.reflector import reflector_node
 
 
 MAX_RETRIES = 3
+MAX_REFLECTIONS = 2
 
 state = AgentState(
     query=input("Enter your research topic: "),
@@ -30,6 +32,8 @@ state = AgentState(
     search_source="",
     selected_tool="",
     memory_used=False,
+    report_approved=False,
+    reflection_count=0,
 )
 
 def display_final_report():
@@ -138,5 +142,16 @@ else:
         state = agentic_research(state, original_query)
     
     state = report_node(state)
+    state = reflector_node(state)
+
+    while not state["report_approved"] and state["reflection_count"] < MAX_REFLECTIONS:
+        state["reflection_count"] += 1
+        print(f"\nReflection attempt {state['reflection_count']}/{MAX_REFLECTIONS}...")
+        state["retry_count"] = 0
+        state["should_continue"] = False
+        state = agentic_research(state, original_query)
+        state = report_node(state)
+        state = reflector_node(state)
+
     state = write_memory(state)
     display_final_report()

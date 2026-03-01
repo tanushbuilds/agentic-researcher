@@ -15,17 +15,17 @@ def get_best_title(query: str, candidates: list) -> str:
         You are a Wikipedia title selector.
         A user wants to research: "{query}"
 
-        Here are the ONLY available Wikipedia page titles to choose from:
+        Choose ONE title from this exact list:
         {chr(10).join(f"{i+1}. {title}" for i, title in enumerate(candidates))}
 
-        Rules:
-        - You MUST pick exactly ONE title from the list above
-        - Do NOT invent or combine titles
-        - If a title exactly matches the query, pick that one
-        - Otherwise pick the MOST SPECIFIC and RELEVANT title from the list
-        - If no title is relevant, pick the closest match
+        RULES:
+        - Your answer MUST be copied EXACTLY from the list above, character for character
+        - Do NOT modify, combine, or invent any title
+        - Do NOT add any explanation
+        - If the query exactly matches a title, return that title
+        - Otherwise return the single most relevant title from the list
 
-        Reply with ONLY the exact title as it appears in the list above, nothing else.
+        Reply with ONLY the title, nothing else.
         """
         
         response = ollama.chat(
