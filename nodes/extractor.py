@@ -28,7 +28,7 @@ def extraction_node(state: AgentState) -> AgentState:
         summary = response["message"]["content"]
         state["extracted_notes"] = summary
     except Exception as e:
-        print(f"Error in extraction_node: {e}")
+        print(f"\nError in extraction_node: {e}")
         state["extracted_notes"] = "No notes extracted."
 
 

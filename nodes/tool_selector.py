@@ -50,8 +50,8 @@ def tool_selector_node(state: AgentState) -> AgentState:
             state['selected_tool'] = "wikipedia"
             print("\nTool selected: Wikipedia")
     except Exception as e:
-        print(f"Error in tool_selector: {e}")
+        print(f"\nError in tool_selector: {e}")
         state["selected_tool"] = "duckduckgo"
-        print("Defaulting to DuckDuckGo")
+        print("\nDefaulting to DuckDuckGo")
 
     return state

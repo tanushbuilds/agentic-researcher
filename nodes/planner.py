@@ -25,8 +25,8 @@ def planner_node(state: AgentState) -> AgentState:
         state["sub_queries"] = sub_queries
         print(f"\nSub-queries: {sub_queries}")
     except Exception as e:
-        print(f"Error in planner_node: {e}")
-        print("Treating original query as single sub-query...")
+        print(f"\nError in planner_node: {e}")
+        print("\nTreating original query as single sub-query...")
         state["sub_queries"] = [state["query"]]
 
     return state

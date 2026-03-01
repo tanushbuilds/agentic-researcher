@@ -78,7 +78,7 @@ def agentic_research(state, original_query) -> AgentState:
                 print(f"\n{primary_tool.title()} retry {state['retry_count']}/{MAX_RETRIES}...")
                 if state["retry_count"] < MAX_RETRIES:
                     state = query_rewriter_node(state)
-                    print(f"Enhanced query: {state["query"]}")
+                    print(f"\nEnhanced query: {state["query"]}")
 
     # Step 4 — fall back to other tool if primary failed
     if not state["should_continue"]:
@@ -120,7 +120,7 @@ if query_complexity == "COMPLEX":
         state = agentic_research(state, sub_query)
         state["sub_query_results"].append(state["extracted_notes"])
     
-    print(f"Sub query results: {state['sub_query_results']}")
+    print(f"\nSub query results: {state['sub_query_results']}")
     state = synthesiser_node(state)
     state["query"] = original_query
 

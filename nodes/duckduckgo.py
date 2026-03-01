@@ -20,7 +20,6 @@ def duckduckgo_node(state: AgentState) -> AgentState:
         ])
         
         print(f"\nDuckDuckGo found {len(results)} results!")
-        print(combined)
         state['duckduckgo_results'] = [combined]
         state['search_source'] = "duckduckgo"
     

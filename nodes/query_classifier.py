@@ -19,8 +19,8 @@ def query_classifier_node(state: AgentState) -> AgentState:
         query_complexity = response["message"]["content"].strip()
         state["query_complexity"] = query_complexity
     except Exception as e:
-        print(f"Error in query_classifier: {e}")
-        print("Defaulting to SIMPLE...")
+        print(f"\nError in query_classifier: {e}")
+        print("\nDefaulting to SIMPLE...")
         state["query_complexity"] = "SIMPLE"
     
     return state

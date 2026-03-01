@@ -20,9 +20,9 @@ def query_rewriter_node(state: AgentState) -> AgentState:
         enhanced_query = response["message"]["content"].strip()
         state["query"] = enhanced_query
     except Exception as e:
-        print(f"Error in query_rewriter: {e}")
-        print("Keeping original query...")
-        
+        print(f"\nError in query_rewriter: {e}")
+        print("\nKeeping original query...")
+
         state["query"] = original_query
 
     return state

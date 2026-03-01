@@ -35,7 +35,7 @@ def get_best_title(query: str, candidates: list) -> str:
         
         return response["message"]["content"].strip()
     except Exception as e:
-        print(f"Error in get_best_title: {e}")
+        print(f"\nError in get_best_title: {e}")
         return candidates[0]  # fallback to first candidate
 
 def search_node(state: AgentState) -> AgentState:
@@ -72,7 +72,7 @@ def search_node(state: AgentState) -> AgentState:
             else:
                 state['wikipedia_results'] = ["No results found."]
     except Exception as e:
-        print(f"Error in search_node: {e}")
+        print(f"\nError in search_node: {e}")
         state['wikipedia_results'] = ["No results found."]
 
     return state

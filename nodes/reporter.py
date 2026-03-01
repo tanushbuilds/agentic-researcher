@@ -26,7 +26,7 @@ def report_node(state: AgentState) -> AgentState:
         report = response["message"]["content"]
         state["final_report"] = report
     except Exception as e:
-        print(f"Error in report_node: {e}")
+        print(f"\nError in report_node: {e}")
         state["final_report"] = "Report generation failed."
 
     return state

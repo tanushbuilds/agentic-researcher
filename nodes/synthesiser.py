@@ -19,8 +19,8 @@ def synthesiser_node(state: AgentState) -> AgentState:
         synthesised_notes = response["message"]["content"].strip()
         state["extracted_notes"] = synthesised_notes
     except Exception as e:
-        print(f"Error in synthesiser_node: {e}")
-        print("Joining sub-query results directly...")
+        print(f"\nError in synthesiser_node: {e}")
+        print("\nJoining sub-query results directly...")
         state["extracted_notes"] = "\n".join(state["sub_query_results"])
 
     return state

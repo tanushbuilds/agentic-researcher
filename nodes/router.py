@@ -29,9 +29,9 @@ def router_node(state: AgentState) -> AgentState:
         else:
             state["should_continue"] = False
     except Exception as e:
-        print(f"Error in router_node: {e}")
-        print("Defaulting to continue...")
-        
+        print(f"\nError in router_node: {e}")
+        print("\nDefaulting to continue...")
+
         state["should_continue"] = True
 
     return state
