@@ -10,7 +10,7 @@ from nodes.combiner import combiner_node
 from nodes.query_classifier import query_classifier_node
 from nodes.planner import planner_node
 from nodes.synthesiser import synthesiser_node
-
+from nodes.memory import read_memory, write_memory
 
 
 MAX_RETRIES = 3
@@ -28,15 +28,14 @@ state = AgentState(
     should_continue=False,
     retry_count=0,
     search_source="",
-    selected_tool=""
+    selected_tool="",
+    memory_used=False,
 )
-
-original_query = state["query"]
-
 
 def display_final_report():
     print(f"\n=== FINAL REPORT (source: {state['search_source']}) ===")
     print(f"\n{state["final_report"]}")
+
 
 
 # Step 2 — helper to run the right search node
@@ -100,36 +99,44 @@ def agentic_research(state, original_query) -> AgentState:
     return state
 
 
+original_query = state["query"]
 
-state = query_classifier_node(state)
-query_complexity = state["query_complexity"]
 
-if query_complexity == "COMPLEX":
-    state = planner_node(state)
-    sub_queries = state["sub_queries"]
-    for sub_query in sub_queries:
-        state["query"] = sub_query
+state = read_memory(state)
 
-        state["retry_count"] = 0
-        state["should_continue"] = False
-        state["wikipedia_results"] = []
-        state["duckduckgo_results"] = []
-        state["search_results"] = []
-        state["extracted_notes"] = ""  
-        
-        state = agentic_research(state, sub_query)
-        state["sub_query_results"].append(state["extracted_notes"])
-    
-    print(f"\nSub query results: {state['sub_query_results']}")
-    state = synthesiser_node(state)
-    state["query"] = original_query
-
+if state["memory_used"]:
+    print("\nUsing cached memory! Skipping search...")
     state = report_node(state)
-
     display_final_report()
 
 else:
-    state = agentic_research(state, original_query)
-    state = report_node(state)
+    state = query_classifier_node(state)
+    query_complexity = state["query_complexity"]
 
+    if query_complexity == "COMPLEX":
+        state = planner_node(state)
+        sub_queries = state["sub_queries"]
+        for sub_query in sub_queries:
+            state["query"] = sub_query
+
+            state["retry_count"] = 0
+            state["should_continue"] = False
+            state["wikipedia_results"] = []
+            state["duckduckgo_results"] = []
+            state["search_results"] = []
+            state["extracted_notes"] = ""  
+            
+            state = agentic_research(state, sub_query)
+            state["sub_query_results"].append(state["extracted_notes"])
+        
+        print(f"\nSub query results: {state['sub_query_results']}")
+        state = synthesiser_node(state)
+        state["query"] = original_query
+
+
+    else:
+        state = agentic_research(state, original_query)
+    
+    state = report_node(state)
+    state = write_memory(state)
     display_final_report()
