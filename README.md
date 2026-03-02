@@ -1,4 +1,4 @@
-# 🔍 Agentic Research Assistant
+# 🔍 Zyven - Agentic Research Assistant
 
 A locally-running multi-node research agent powered by Mistral via Ollama. Give it any topic and it intelligently classifies complexity, selects tools, searches multiple sources, rewrites failed queries, remembers past research, and generates a full structured report — entirely on your own machine.
 
