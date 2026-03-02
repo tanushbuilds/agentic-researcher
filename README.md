@@ -94,8 +94,8 @@ flowchart TD
 
 **1. Clone the repo**
 ```bash
-git clone https://github.com/tanushbuilds/agentic-research-assistant.git
-cd agentic-research-assistant
+git clone https://github.com/tanushbuilds/agentic-researcher.git
+cd agentic-researcher
 ```
 
 **2. Install dependencies**
