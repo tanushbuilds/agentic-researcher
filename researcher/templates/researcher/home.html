@@ -4,6 +4,7 @@
 
 {% block extra_styles %}
         /* ── Welcome Screen ── */
+        
         .welcome-screen {
             flex: 1;
             display: flex;
@@ -126,8 +127,8 @@
 
         /* ── Progress Panel ── */
         .progress-panel {
-            width: 300px;
-            min-width: 300px;
+            width: 200px;
+            min-width: 200px;
             border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
@@ -174,6 +175,10 @@
                 opacity: 1;
                 transform: translateY(0);
             }
+        }
+
+        .progress-message{
+            color: var(--text-secondary);
         }
 
         .progress-dot {
@@ -457,7 +462,7 @@
             else if (type === 'warning') dotClass = 'warning';
             else if (type === 'active') dotClass = 'active';
 
-            item.innerHTML = `<div class="progress-dot ${dotClass}"></div><span>${message}</span>`;
+            item.innerHTML = `<div class="progress-dot ${dotClass}"></div><span class="progress-message">${message}</span>`;
             feed.appendChild(item);
             feed.scrollTop = feed.scrollHeight;
         }

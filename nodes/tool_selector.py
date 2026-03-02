@@ -8,30 +8,20 @@ def tool_selector_node(state: AgentState) -> AgentState:
     try:
 
         prompt = f"""
-        You are a search strategy expert.
-        You are deciding which search tool to use for a research query.
-        
-        Query: "{query}"
-        
-        WIKIPEDIA is better for:
-        - Established, factual, historical topics
-        - Scientific concepts
-        - People, places, events from the past
-        - Example: "Milky Way", "World War 2", "Photosynthesis"
-        
-        DUCKDUCKGO is better for:
-        - Recent or current topics
-        - Practical how-to queries
-        - Technology products or tools
-        - Trending topics
-        - Example: "Latest AI Trends", "How to use Claude AI", "Best Python libraries 2026"
+        Decide the best search tool for the following research query.
 
-        BOTH is better when:
-        - The topic has both a rich historical background AND recent developments
-        - The topic is a living person, ongoing event, or evolving technology
-        - You need both foundational knowledge and current information
-        
-        Reply with ONLY one word: WIKIPEDIA, DUCKDUCKGO or BOTH
+        Query: "{query}"
+
+        Rules:
+        - Choose ONE of: WIKIPEDIA, DUCKDUCKGO, BOTH
+        - Reply with ONLY that word, nothing else.
+
+        Guidelines:
+        - WIKIPEDIA → historical/factual topics, science concepts, past events/people.
+        - DUCKDUCKGO → recent events, trending topics, tech products, practical how-to queries.
+        - BOTH → topics with historical context AND recent developments, ongoing events, or living persons.
+
+        Output only a single word: WIKIPEDIA, DUCKDUCKGO, or BOTH.
         """
 
         response = ollama.chat(

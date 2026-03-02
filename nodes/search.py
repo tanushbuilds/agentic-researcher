@@ -45,7 +45,7 @@ def search_node(state: AgentState) -> AgentState:
     try:
 
         # Step 1 — Get 10 candidate titles from Wikipedia
-        candidates = wikipedia.search(query, results=20)
+        candidates = wikipedia.search(query, results=5)
 
         if not candidates:
             print("\nNo Wikipedia results found at all.")

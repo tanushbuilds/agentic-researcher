@@ -12,6 +12,7 @@ from nodes.planner import planner_node
 from nodes.synthesiser import synthesiser_node
 from nodes.memory import read_memory, write_memory
 from nodes.reflector import reflector_node
+from nodes.parallel_search_node import parallel_search_node
 
 
 def run_agent(query: str, send=None) -> AgentState:
@@ -43,17 +44,12 @@ def run_agent(query: str, send=None) -> AgentState:
     MAX_RETRIES = 3
     MAX_REFLECTIONS = 2
 
-
-
-
-
     # Step 2 — helper to run the right search node
     def run_search(state, tool):
 
         if state["selected_tool"] == "both":
             send("Searching both tools...")
-            state = search_node(state)
-            state = duckduckgo_node(state)
+            state = parallel_search_node(state)
             state = combiner_node(state)
             send("Both sources combined! Moving on...")
             state["should_continue"] = True
