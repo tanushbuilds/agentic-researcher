@@ -1,6 +1,7 @@
 import ollama
 from agent_state import AgentState
 
+
 def planner_node(state: AgentState) -> AgentState:
 
     try:
@@ -14,13 +15,14 @@ def planner_node(state: AgentState) -> AgentState:
         - Return ONLY a numbered list, one per line
         - No explanations, no extra text
         """
-        
+
         response = ollama.chat(
-            model="mistral",
-            messages=[{"role":"user", "content": prompt}]
+            model="mistral", messages=[{"role": "user", "content": prompt}]
         )
         sub_queries = response["message"]["content"].strip().split("\n")
-        sub_queries = list(sub_queries[i].split(". ")[1] for i in range(len(sub_queries)))
+        sub_queries = list(
+            sub_queries[i].split(". ")[1] for i in range(len(sub_queries))
+        )
 
         state["sub_queries"] = sub_queries
         print(f"\nSub-queries: {sub_queries}")

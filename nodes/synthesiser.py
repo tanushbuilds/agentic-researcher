@@ -12,8 +12,7 @@ def synthesiser_node(state: AgentState) -> AgentState:
         """
 
         response = ollama.chat(
-            model="mistral",
-            messages=[{"role": "user", "content": prompt}]
+            model="mistral", messages=[{"role": "user", "content": prompt}]
         )
 
         synthesised_notes = response["message"]["content"].strip()

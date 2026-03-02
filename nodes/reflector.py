@@ -22,8 +22,7 @@ def reflector_node(state: AgentState) -> AgentState:
         """
 
         response = ollama.chat(
-            model="mistral",
-            messages=[{"role": "user", "content": prompt}]
+            model="mistral", messages=[{"role": "user", "content": prompt}]
         )
 
         report_approved = response["message"]["content"].strip()

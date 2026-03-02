@@ -1,6 +1,7 @@
 import ollama
 from agent_state import AgentState
 
+
 def router_node(state: AgentState) -> AgentState:
     query = state.get("query", "")
     search_results = "\n\n".join(state.get("search_results", []))
@@ -18,8 +19,7 @@ def router_node(state: AgentState) -> AgentState:
         """
 
         response = ollama.chat(
-            model="mistral",
-            messages=[{"role": "user", "content": prompt}]
+            model="mistral", messages=[{"role": "user", "content": prompt}]
         )
 
         answer = response["message"]["content"].strip().upper()

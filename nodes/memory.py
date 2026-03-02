@@ -4,6 +4,7 @@ import os
 from datetime import datetime
 from agent_state import AgentState
 
+
 def write_memory(state: AgentState) -> AgentState:
 
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -22,7 +23,7 @@ def write_memory(state: AgentState) -> AgentState:
 
     with open("memory.json", "w") as f:
         json.dump(memory, f, indent=4)
-    
+
     print(f"\nMemory saved for: '{state['query']}'")
 
     return state
@@ -49,8 +50,7 @@ def read_memory(state: AgentState) -> AgentState:
                 """
 
                 response = ollama.chat(
-                    model="mistral",
-                    messages=[{"role": "user", "content": prompt}]
+                    model="mistral", messages=[{"role": "user", "content": prompt}]
                 )
 
                 is_query_match = response["message"]["content"].strip()
@@ -59,8 +59,10 @@ def read_memory(state: AgentState) -> AgentState:
                     state["extracted_notes"] = memory[is_query_match]["notes"]
                     state["memory_used"] = True
 
-                    print(f"\nMemory match found: '{is_query_match}'! Skipping search...")
-                    
+                    print(
+                        f"\nMemory match found: '{is_query_match}'! Skipping search..."
+                    )
+
                     return state
                 else:
                     print(f"\nNo memory match found. Proceeding with fresh search...")

@@ -1,6 +1,7 @@
 import ollama
 from agent_state import AgentState
 
+
 def report_node(state: AgentState) -> AgentState:
     notes = "\n\n".join([state.get("extracted_notes", "")])
 
@@ -19,8 +20,7 @@ def report_node(state: AgentState) -> AgentState:
         """
 
         response = ollama.chat(
-            model="mistral",
-            messages=[{"role": "user", "content": prompt}]
+            model="mistral", messages=[{"role": "user", "content": prompt}]
         )
 
         report = response["message"]["content"]

@@ -1,7 +1,7 @@
 from agent_state import AgentState
 
 
-def combiner_node(state : AgentState) -> AgentState:
+def combiner_node(state: AgentState) -> AgentState:
     wikipedia_results = state["wikipedia_results"]
     duckduckgo_results = state["duckduckgo_results"]
 
@@ -15,5 +15,5 @@ def combiner_node(state : AgentState) -> AgentState:
 
     state["search_results"] = [combined_result]
     print(f"\n🔗 Combined Wikipedia and DuckDuckGo results!")
-    
+
     return state

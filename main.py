@@ -14,144 +14,152 @@ from nodes.memory import read_memory, write_memory
 from nodes.reflector import reflector_node
 
 
-MAX_RETRIES = 3
-MAX_REFLECTIONS = 2
+def run_agent(query: str, send=None) -> AgentState:
+    
+    # default send to print if not provided
+    # this way terminal still works without Django
+    if send is None:
+        send = lambda message, status='default': print(message)
+    
+    state = AgentState(
+        query=query,
+        query_complexity="",
+        sub_queries=[],
+        sub_query_results=[],
+        wikipedia_results=[],
+        duckduckgo_results=[],
+        search_results=[],
+        extracted_notes="",
+        final_report="",
+        should_continue=False,
+        retry_count=0,
+        search_source="",
+        selected_tool="",
+        memory_used=False,
+        report_approved=False,
+        reflection_count=0,
+    )
+    
+    MAX_RETRIES = 3
+    MAX_REFLECTIONS = 2
 
-state = AgentState(
-    query=input("Enter your research topic: "),
-    query_complexity="",
-    sub_queries=[],
-    sub_query_results=[],
-    wikipedia_results=[],
-    duckduckgo_results=[],
-    search_results=[],
-    extracted_notes="",
-    final_report="",
-    should_continue=False,
-    retry_count=0,
-    search_source="",
-    selected_tool="",
-    memory_used=False,
-    report_approved=False,
-    reflection_count=0,
-)
-
-def display_final_report():
-    print(f"\n=== FINAL REPORT (source: {state['search_source']}) ===")
-    print(f"\n{state["final_report"]}")
 
 
 
-# Step 2 — helper to run the right search node
-def run_search(state, tool):
 
-    if state["selected_tool"] == "both":
-        print("\nSearching both tools...")
-        state = search_node(state)
-        state = duckduckgo_node(state)
-        state = combiner_node(state)
-        print("\nBoth sources combined! Moving on...")
-        state["should_continue"] = True
+    # Step 2 — helper to run the right search node
+    def run_search(state, tool):
 
-        return state
+        if state["selected_tool"] == "both":
+            send("Searching both tools...")
+            state = search_node(state)
+            state = duckduckgo_node(state)
+            state = combiner_node(state)
+            send("Both sources combined! Moving on...")
+            state["should_continue"] = True
 
-    elif tool == "wikipedia":
-        return search_node(state)
+            return state
 
-    else:
-        return duckduckgo_node(state)
+        elif tool == "wikipedia":
+            return search_node(state)
 
-def agentic_research(state, original_query) -> AgentState:
-    state = tool_selector_node(state)
-    primary_tool = state["selected_tool"]
-    fallback_tool = "duckduckgo" if primary_tool == "wikipedia" else "wikipedia"
-    print(f"\nPrimary tool: {primary_tool}...")
-    if state["selected_tool"] == "both":
-        state = run_search(state, "both")
-    else:
-        while state["retry_count"] < MAX_RETRIES:
-            state = run_search(state, primary_tool)
+        else:
+            return duckduckgo_node(state)
+
+
+    def agentic_research(state, original_query) -> AgentState:
+        state = tool_selector_node(state)
+        primary_tool = state["selected_tool"]
+        fallback_tool = "duckduckgo" if primary_tool == "wikipedia" else "wikipedia"
+        send(f"Primary tool: {primary_tool}...")
+        if state["selected_tool"] == "both":
+            state = run_search(state, "both")
+        else:
+            while state["retry_count"] < MAX_RETRIES:
+                state = run_search(state, primary_tool)
+                state = router_node(state)
+
+                if state["should_continue"]:
+                    send(f"{primary_tool.title()} results good! Moving on...")
+                    break
+                else:
+                    state["retry_count"] += 1
+                    send(
+                        f"{primary_tool.title()} retry {state['retry_count']}/{MAX_RETRIES}..."
+                    )
+                    if state["retry_count"] < MAX_RETRIES:
+                        state = query_rewriter_node(state)
+                        send(f"Enhanced query: {state["query"]}")
+
+        # Step 4 — fall back to other tool if primary failed
+        if not state["should_continue"]:
+            send(f"Falling back to {fallback_tool}...")
+            state["query"] = original_query
+            state["retry_count"] = 0
+            state = run_search(state, fallback_tool)
             state = router_node(state)
 
             if state["should_continue"]:
-                print(f"\n{primary_tool.title()} results good! Moving on...")
-                break
+                send(f"{fallback_tool.title()} results good! Moving on...")
             else:
-                state["retry_count"] += 1
-                print(f"\n{primary_tool.title()} retry {state['retry_count']}/{MAX_RETRIES}...")
-                if state["retry_count"] < MAX_RETRIES:
-                    state = query_rewriter_node(state)
-                    print(f"\nEnhanced query: {state["query"]}")
+                send("Both tools struggled, proceeding with what we have...")
 
-    # Step 4 — fall back to other tool if primary failed
-    if not state["should_continue"]:
-        print(f"\nFalling back to {fallback_tool}...")
-        state["query"] = original_query
-        state["retry_count"] = 0
-        state = run_search(state, fallback_tool)
-        state = router_node(state)
+        # Step 5 — extract and report
+        state = extraction_node(state)
 
-        if state["should_continue"]:
-            print(f"\n{fallback_tool.title()} results good! Moving on...")
-        else:
-            print("\nBoth tools struggled, proceeding with what we have...")
+        return state
 
 
-    # Step 5 — extract and report
-    state = extraction_node(state)
-
-    return state
+    original_query = state["query"]
 
 
-original_query = state["query"]
+    state = read_memory(state)
 
-
-state = read_memory(state)
-
-if state["memory_used"]:
-    print("\nUsing cached memory! Skipping search...")
-    state = report_node(state)
-    display_final_report()
-
-else:
-    state = query_classifier_node(state)
-    query_complexity = state["query_complexity"]
-
-    if query_complexity == "COMPLEX":
-        state = planner_node(state)
-        sub_queries = state["sub_queries"]
-        for sub_query in sub_queries:
-            state["query"] = sub_query
-
-            state["retry_count"] = 0
-            state["should_continue"] = False
-            state["wikipedia_results"] = []
-            state["duckduckgo_results"] = []
-            state["search_results"] = []
-            state["extracted_notes"] = ""  
-            
-            state = agentic_research(state, sub_query)
-            state["sub_query_results"].append(state["extracted_notes"])
-        
-        print(f"\nSub query results: {state['sub_query_results']}")
-        state = synthesiser_node(state)
-        state["query"] = original_query
-
+    if state["memory_used"]:
+        send("Using cached memory! Skipping search...")
+        state = report_node(state)
 
     else:
-        state = agentic_research(state, original_query)
-    
-    state = report_node(state)
-    state = reflector_node(state)
+        state = query_classifier_node(state)
+        query_complexity = state["query_complexity"]
 
-    while not state["report_approved"] and state["reflection_count"] < MAX_REFLECTIONS:
-        state["reflection_count"] += 1
-        print(f"\nReflection attempt {state['reflection_count']}/{MAX_REFLECTIONS}...")
-        state["retry_count"] = 0
-        state["should_continue"] = False
-        state = agentic_research(state, original_query)
+        if query_complexity == "COMPLEX":
+            state = planner_node(state)
+            sub_queries = state["sub_queries"]
+            for sub_query in sub_queries:
+                state["query"] = sub_query
+
+                state["retry_count"] = 0
+                state["should_continue"] = False
+                state["wikipedia_results"] = []
+                state["duckduckgo_results"] = []
+                state["search_results"] = []
+                state["extracted_notes"] = ""
+
+                state = agentic_research(state, sub_query)
+                state["sub_query_results"].append(state["extracted_notes"])
+
+            send("All sub-queries complete! Synthesising...", "active")
+            state = synthesiser_node(state)
+            state["query"] = original_query
+
+        else:
+            state = agentic_research(state, original_query)
+
         state = report_node(state)
         state = reflector_node(state)
 
-    state = write_memory(state)
-    display_final_report()
+        while not state["report_approved"] and state["reflection_count"] < MAX_REFLECTIONS:
+            state["reflection_count"] += 1
+            send(f"Reflection attempt {state['reflection_count']}/{MAX_REFLECTIONS}...")
+            state["retry_count"] = 0
+            state["should_continue"] = False
+            state = agentic_research(state, original_query)
+            state = report_node(state)
+            state = reflector_node(state)
+
+        state = write_memory(state)
+
+        
+    return state
+

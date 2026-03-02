@@ -1,8 +1,9 @@
 import ollama
 from agent_state import AgentState
 
+
 def tool_selector_node(state: AgentState) -> AgentState:
-    query = state['query']
+    query = state["query"]
 
     try:
 
@@ -34,21 +35,19 @@ def tool_selector_node(state: AgentState) -> AgentState:
         """
 
         response = ollama.chat(
-            model="mistral",
-            messages=[{"role": "user", "content": prompt}]
+            model="mistral", messages=[{"role": "user", "content": prompt}]
         )
-
 
         tool = response["message"]["content"].strip().upper()
 
         if "BOTH" in tool:
-            state['selected_tool'] = "both"
+            state["selected_tool"] = "both"
             print("\nTool selected: Both")
         elif "DUCKDUCKGO" in tool:
-            state['selected_tool'] = "duckduckgo"
+            state["selected_tool"] = "duckduckgo"
             print("\nTool selected: DuckDuckGo")
         else:
-            state['selected_tool'] = "wikipedia"
+            state["selected_tool"] = "wikipedia"
             print("\nTool selected: Wikipedia")
     except Exception as e:
         print(f"\nError in tool_selector: {e}")

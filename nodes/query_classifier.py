@@ -1,8 +1,9 @@
 import ollama
 from agent_state import AgentState
 
+
 def query_classifier_node(state: AgentState) -> AgentState:
-    
+
     try:
         prompt = f"""
         You are a query complexity analyser.
@@ -10,10 +11,9 @@ def query_classifier_node(state: AgentState) -> AgentState:
         Research Query: {state["query"]}
         Reply with ONLY one word: COMPLEX or SIMPLE
         """
-        
+
         response = ollama.chat(
-            model="mistral",
-            messages=[{"role": "user", "content": prompt}]
+            model="mistral", messages=[{"role": "user", "content": prompt}]
         )
 
         query_complexity = response["message"]["content"].strip()
@@ -22,5 +22,5 @@ def query_classifier_node(state: AgentState) -> AgentState:
         print(f"\nError in query_classifier: {e}")
         print("\nDefaulting to SIMPLE...")
         state["query_complexity"] = "SIMPLE"
-    
+
     return state

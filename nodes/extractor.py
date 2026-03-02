@@ -1,6 +1,7 @@
 import ollama
 from agent_state import AgentState
 
+
 def extraction_node(state: AgentState) -> AgentState:
     text_to_summarize = "\n\n".join(state.get("search_results", []))
 
@@ -21,8 +22,7 @@ def extraction_node(state: AgentState) -> AgentState:
         """
 
         response = ollama.chat(
-            model="mistral",
-            messages=[{"role": "user", "content": prompt}]
+            model="mistral", messages=[{"role": "user", "content": prompt}]
         )
 
         summary = response["message"]["content"]
@@ -30,6 +30,5 @@ def extraction_node(state: AgentState) -> AgentState:
     except Exception as e:
         print(f"\nError in extraction_node: {e}")
         state["extracted_notes"] = "No notes extracted."
-
 
     return state

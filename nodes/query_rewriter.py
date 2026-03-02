@@ -1,6 +1,7 @@
 import ollama
 from agent_state import AgentState
 
+
 def query_rewriter_node(state: AgentState) -> AgentState:
     original_query = state["query"]
     try:
@@ -13,8 +14,7 @@ def query_rewriter_node(state: AgentState) -> AgentState:
         """
 
         response = ollama.chat(
-            model="mistral",
-            messages=[{"role": "user", "content" : prompt}]
+            model="mistral", messages=[{"role": "user", "content": prompt}]
         )
 
         enhanced_query = response["message"]["content"].strip()
