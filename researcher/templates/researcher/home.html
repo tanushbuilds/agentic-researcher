@@ -219,7 +219,6 @@
             }
         }
 
-        /* ── Report Panel ── */
         .report-panel {
             flex: 1;
             display: flex;
@@ -250,9 +249,12 @@
         }
 
         .report-content {
+            display: flex;
+            justify-content: center;
             flex: 1;
             overflow-y: auto;
             padding: 32px 40px;
+            
         }
 
         .report-placeholder {
@@ -278,8 +280,62 @@
             font-size: 14px;
             line-height: 1.75;
             color: var(--text-primary);
-            white-space: pre-wrap;
-            max-width: 680px;
+            font-size: 15px;
+            line-height: 1.8;
+            color: var(--text-primary);
+            width: 100%;
+        }
+
+        /* Title */
+        .report-text h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            letter-spacing: -0.4px;
+        }
+
+        /* Main Sections */
+        .report-text h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-top: 32px;
+            margin-bottom: 14px;
+            letter-spacing: -0.2px;
+        }
+
+        /* Subsections */
+        .report-text h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 22px;
+            margin-bottom: 10px;
+        }
+
+        /* Paragraph spacing */
+        .report-text p {
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+        }
+
+        /* Lists */
+        .report-text ul {
+            padding-left: 22px;
+            margin-bottom: 18px;
+        }
+
+        .report-text li {
+            margin-bottom: 8px;
+        }
+
+        /* Add subtle divider under title */
+        .report-text h1::after {
+            content: "";
+            display: block;
+            width: 48px;
+            height: 3px;
+            background: var(--accent);
+            margin-top: 10px;
+            border-radius: 3px;
         }
 
         /* ── Spinner ── */

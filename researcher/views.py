@@ -7,6 +7,7 @@ import sys
 import os
 import threading
 import time
+import markdown
 
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -16,15 +17,18 @@ from agent_state import AgentState
 def home(request):
     return render(request, 'researcher/home.html')
 
-def run_research(request):
+def run_research(request) :
     query = request.GET.get('query', '')
     
     def stream():
         messages = []
 
         def send(message, status='default'):
-            messages.append(json.dumps({'type': 'progress', 'message': message, 'status': status}))
-
+            messages.append(json.dumps({
+                'type': 'progress',
+                'message': message,
+                'status': status
+            }))
 
         result = {}
 
@@ -43,7 +47,19 @@ def run_research(request):
             yield f"data: {messages.pop(0)}\n\n"
 
         state = result['state']
-        yield f"data: {json.dumps({'type': 'done', 'report': state['final_report'], 'source': state['search_source']})}\n\n"
+
+        final_report_markdown = state['final_report']
+
+        html_report = markdown.markdown(
+            final_report_markdown,
+            extensions=["fenced_code", "tables"]
+        )
+
+        yield f"data: {json.dumps({
+            'type': 'done',
+            'report': html_report,
+            'source': state['search_source']
+        })}\n\n"
     
     return StreamingHttpResponse(stream(), content_type='text/event-stream')
 
