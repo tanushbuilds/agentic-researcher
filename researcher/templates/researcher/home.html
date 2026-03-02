@@ -1,172 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "researcher/base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zyven</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap"
-        rel="stylesheet">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
-        rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+{% block title %}Zyven{% endblock %}
 
-        :root {
-            --bg: #1a1a18;
-            --sidebar-bg: #161614;
-            --surface: #242422;
-            --surface-hover: #2c2c2a;
-            --border: #333331;
-            --text-primary: #e4e4e0;
-            --text-secondary: #9a9a96;
-            --text-muted: #636360;
-            --accent: #c8715a;
-            --accent-hover: #d4806a;
-            --success: #5fa870;
-            --error: #b86b65;
-            --warning: #c09035;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background: var(--bg);
-            color: var(--text-primary);
-            height: 100vh;
-            display: flex;
-            overflow: hidden;
-        }
-
-        /* ── Sidebar ── */
-        .sidebar {
-            width: 260px;
-            min-width: 260px;
-            background: var(--sidebar-bg);
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            padding: 16px 0;
-        }
-
-        .sidebar-header {
-            padding: 8px 16px 16px;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 8px;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-            color: var(--text-primary);
-        }
-
-        .logo-text {
-            font-size: 24px;
-            font-weight: 500;
-            letter-spacing: -0.2px;
-        }
-
-        .new-research-btn {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin: 8px 12px;
-            padding: 8px 12px;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-            background: transparent;
-            color: var(--text-primary);
-            font-size: 13px;
-            cursor: pointer;
-            transition: background 0.15s;
-            font-family: inherit;
-        }
-
-        .new-research-btn:hover {
-            background: var(--surface-hover);
-        }
-
-        .sidebar-section {
-            padding: 4px 12px;
-            margin-top: 8px;
-        }
-
-        .sidebar-label {
-            font-size: 11px;
-            font-weight: 500;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            padding: 0 4px;
-            margin-bottom: 4px;
-        }
-
-        .history-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 7px 8px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.15s;
-            color: var(--text-secondary);
-            font-size: 13px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .history-item:hover {
-            background: var(--surface-hover);
-            color: var(--text-primary);
-        }
-
-        .history-item svg {
-            min-width: 14px;
-            opacity: 0.5;
-        }
-
-        .sidebar-footer {
-            margin-top: auto;
-            padding: 12px;
-            border-top: 1px solid var(--border);
-        }
-
-        .nav-btn {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 8px;
-            border-radius: 8px;
-            cursor: pointer;
-            color: var(--text-secondary);
-            font-size: 13px;
-            transition: all 0.15s;
-            text-decoration: none;
-        }
-
-        .nav-btn:hover {
-            background: var(--surface-hover);
-            color: var(--text-primary);
-        }
-
-        /* ── Main ── */
-        .main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
+{% block extra_styles %}
         /* ── Welcome Screen ── */
         .welcome-screen {
             flex: 1;
@@ -179,11 +15,12 @@
         }
 
         .welcome-title {
-            font-size: 50px;
-            font-weight: 400;
+            font-size: 32px;
+            font-weight: 500;
             color: var(--text-primary);
             text-align: center;
-            letter-spacing: -0.5px;
+            letter-spacing: -0.4px;
+            line-height: 1.25;
         }
 
         /* ── Input ── */
@@ -211,10 +48,10 @@
             border: none;
             outline: none;
             color: var(--text-primary);
-            font-size: 16px;
+            font-size: 15px;
             font-family: inherit;
             resize: none;
-            line-height: 1.5;
+            line-height: 1.6;
             min-height: 50px;
             max-height: 200px;
         }
@@ -275,9 +112,10 @@
         }
 
         .research-query {
-            font-size: 15px;
+            font-size: 14px;
             color: var(--text-primary);
             font-weight: 500;
+            letter-spacing: -0.1px;
         }
 
         .research-body {
@@ -432,25 +270,11 @@
 
         .report-text {
             font-family: inherit;
-            font-size: 15px;
-            line-height: 1.85;
+            font-size: 14px;
+            line-height: 1.75;
             color: var(--text-primary);
             white-space: pre-wrap;
             max-width: 680px;
-        }
-
-        /* ── Scrollbar ── */
-        ::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 2px;
         }
 
         /* ── Spinner ── */
@@ -466,16 +290,9 @@
                 transform: rotate(360deg);
             }
         }
-    </style>
-</head>
+{% endblock %}
 
-<body>
-
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <a class="logo" href="#"><span class="logo-text">Zyven</span></a>
-        </div>
-
+{% block sidebar_top %}
         <button class="new-research-btn" onclick="resetToWelcome()">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="12" y1="5" x2="12" y2="19" />
@@ -483,7 +300,9 @@
             </svg>
             New Research
         </button>
+{% endblock %}
 
+{% block sidebar_middle %}
         <div class="sidebar-section">
             <div class="sidebar-label">Recent</div>
             <div id="history-list">
@@ -491,28 +310,9 @@
                     history yet</div>
             </div>
         </div>
+{% endblock %}
 
-        <div class="sidebar-footer">
-            <a class="nav-btn" href="/memory/">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z" />
-                    <path d="M12 8v4l3 3" />
-                </svg>
-                Memory Viewer
-            </a>
-            <a class="nav-btn" href="/settings/">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="3" />
-                    <path
-                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-                </svg>
-                Settings
-            </a>
-        </div>
-    </aside>
-
-    <main class="main">
-
+{% block main_content %}
         <!-- Welcome Screen -->
         <div class="welcome-screen" id="welcome-screen">
             <h1 class="welcome-title">What do you want to research?</h1>
@@ -571,10 +371,51 @@
                 </div>
             </div>
         </div>
+{% endblock %}
 
-    </main>
-
+{% block scripts %}
     <script>
+        // home-specific sidebar styles
+        const style = document.createElement('style');
+        style.textContent = `
+            .sidebar-section {
+                padding: 4px 12px;
+                margin-top: 8px;
+            }
+            .sidebar-label {
+                font-size: 11px;
+                font-weight: 500;
+                color: var(--text-muted);
+                text-transform: uppercase;
+                letter-spacing: 0.8px;
+                padding: 0 4px;
+                margin-bottom: 4px;
+            }
+            .history-item {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 7px 8px;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: background 0.15s;
+                color: var(--text-secondary);
+                font-size: 13px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .history-item:hover {
+                background: var(--surface-hover);
+                color: var(--text-primary);
+            }
+            .history-item svg {
+                min-width: 14px;
+                opacity: 0.5;
+            }
+        `;
+        document.head.appendChild(style);
+
         function autoResize(el) {
             el.style.height = 'auto';
             el.style.height = Math.min(el.scrollHeight, 200) + 'px';
@@ -692,7 +533,4 @@
             list.prepend(item);
         }
     </script>
-
-</body>
-
-</html>
+{% endblock %}

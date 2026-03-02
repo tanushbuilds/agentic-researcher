@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import StreamingHttpResponse
+from django.shortcuts import redirect
 from main import run_agent
 import json
 import sys
@@ -46,6 +47,35 @@ def run_research(request):
     
     return StreamingHttpResponse(stream(), content_type='text/event-stream')
 
+
+
+def memory(request):
+    memory_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'memory.json')
+    if os.path.exists(memory_path):
+        with open(memory_path, 'r') as f:
+            memory_data = json.load(f)
+    else:
+        memory_data = {}
+    return render(request, 'researcher/memory.html', {'memory': memory_data})
+
+
+def delete_memory(request, key):
+    memory_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'memory.json')
+    if os.path.exists(memory_path):
+        with open(memory_path, 'r') as f:
+            memory_data = json.load(f)
+        if key in memory_data:
+            del memory_data[key]
+        with open(memory_path, 'w') as f:
+            json.dump(memory_data, f, indent=4)
+    return redirect('memory')
+
+
+def clear_memory(request):
+    memory_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'memory.json')
+    with open(memory_path, 'w') as f:
+        json.dump({}, f)
+    return redirect('memory')
 
 
 
