@@ -22,7 +22,12 @@ flowchart TD
 
     G -->|Wikipedia| J[search_node]
     G -->|DuckDuckGo| K[duckduckgo_node]
-    G -->|Both| J & K --> L[combiner_node]
+    G -->|Both| PS[parallel_search_node]
+
+    PS --> J
+    PS --> K
+    J --> L[combiner_node]
+    K --> L
 
     J --> M[router_node]
     K --> M
@@ -49,6 +54,7 @@ flowchart TD
     style A fill:#6366f1,color:#fff
     style E fill:#22c55e,color:#fff
     style H fill:#f59e0b,color:#fff
+    style PS fill:#ef4444,color:#fff
     style L fill:#3b82f6,color:#fff
     style R fill:#8b5cf6,color:#fff
     style T fill:#10b981,color:#fff
