@@ -42,7 +42,10 @@ def report_node(state: AgentState) -> AgentState:
         """
 
         response = ollama.chat(
-            model="mistral", messages=[{"role": "user", "content": prompt}]
+            model="mistral", messages=[
+                {"role": "system", "content": "You are a professional research report writer. You write clear, structured, and detailed research reports based on provided notes."},
+                {"role": "user", "content": prompt}],
+            options={"temperature": 0.1}
         )
 
         report = response["message"]["content"]

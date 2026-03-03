@@ -22,7 +22,10 @@ def extraction_node(state: AgentState) -> AgentState:
         """
 
         response = ollama.chat(
-            model="mistral", messages=[{"role": "user", "content": prompt}]
+            model="mistral", messages=[
+                {"role": "system", "content": "You are a precise research analyst. You extract only the most relevant facts from provided text, ignoring anything unrelated to the topic."},
+                {"role": "user", "content": prompt}],
+            options={"temperature": 0.1}
         )
 
         summary = response["message"]["content"]
