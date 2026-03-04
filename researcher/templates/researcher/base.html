@@ -33,6 +33,7 @@
             --success: #5fa870;
             --error: #b86b65;
             --warning: #c09035;
+            --sidebar-width: 280px;
         }
 
         body {
@@ -46,17 +47,25 @@
 
         /* ── Sidebar ── */
         .sidebar {
-            width: 248px;
-            min-width: 248px;
+            width: var(--sidebar-width);
+            min-width: var(--sidebar-width);
             background: var(--sidebar-bg);
             border-right: 1px solid var(--border-subtle);
             display: flex;
             flex-direction: column;
             position: relative;
             overflow: hidden;
+            transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                        min-width 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                        border-color 0.3s;
         }
 
-        /* Sidebar top glow */
+        .sidebar.collapsed {
+            width: 0;
+            min-width: 0;
+            border-color: transparent;
+        }
+
         .sidebar::before {
             content: '';
             position: absolute;
@@ -68,9 +77,44 @@
             pointer-events: none;
         }
 
+        /* Prevents content squishing during transition */
+        .sidebar-inner {
+            width: var(--sidebar-width);
+            min-width: var(--sidebar-width);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ── Toggle Button ── */
+        .sidebar-toggle {
+            position: absolute;
+            top: 18px;
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--sidebar-bg);
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s, color 0.2s, border-color 0.2s;
+            z-index: 100;
+            left: calc(var(--sidebar-width) - 42px);
+        }
+
+        .sidebar-toggle:hover {
+            background: var(--surface);
+            color: var(--text-primary);
+            border-color: rgba(200,113,90,0.25);
+        }
+
         /* ── Logo area ── */
         .sidebar-header {
-            padding: 20px 18px 14px;
+            padding: 18px 18px 14px;
             border-bottom: 1px solid var(--border-subtle);
         }
 
@@ -99,25 +143,13 @@
             font-weight: 600;
             letter-spacing: -0.3px;
             color: var(--text-primary);
+            white-space: nowrap;
         }
 
         .logo-letter {
             font-family: 'Playfair Display', Georgia, serif;
             color: var(--accent);
             font-style: italic;
-        }
-
-        .logo-badge {
-            font-size: 9px;
-            font-weight: 600;
-            letter-spacing: 0.8px;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            background: var(--surface);
-            border: 1px solid var(--border);
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-left: 2px;
         }
 
         /* ── New Research Button ── */
@@ -139,6 +171,7 @@
             letter-spacing: -0.1px;
             position: relative;
             overflow: hidden;
+            white-space: nowrap;
         }
 
         .new-research-btn::before {
@@ -156,13 +189,12 @@
             background: var(--surface);
         }
 
-        .new-research-btn:hover::before {
-            opacity: 1;
-        }
+        .new-research-btn:hover::before { opacity: 1; }
 
         .new-research-btn svg {
             opacity: 0.6;
             transition: opacity 0.2s;
+            flex-shrink: 0;
         }
 
         .new-research-btn:hover svg {
@@ -190,6 +222,7 @@
             letter-spacing: 1.2px;
             padding: 0 6px;
             margin-bottom: 6px;
+            white-space: nowrap;
         }
 
         .history-item {
@@ -240,6 +273,7 @@
             transition: all 0.15s;
             text-decoration: none;
             letter-spacing: -0.1px;
+            white-space: nowrap;
         }
 
         .nav-btn:hover {
@@ -255,12 +289,11 @@
         .nav-btn svg {
             opacity: 0.5;
             transition: opacity 0.15s;
+            flex-shrink: 0;
         }
 
         .nav-btn:hover svg,
-        .nav-btn.active svg {
-            opacity: 0.8;
-        }
+        .nav-btn.active svg { opacity: 0.8; }
 
         /* ── Main ── */
         .main {
@@ -268,6 +301,7 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            position: relative;
         }
 
         /* ── Scrollbar ── */
@@ -282,47 +316,115 @@
 
 <body>
 
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <a class="logo" href="/">
-                <div class="logo-icon">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5">
-                        <circle cx="11" cy="11" r="8"/>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                    </svg>
-                </div>
-                <span class="logo-text"><span class="logo-letter">Z</span>yven</span>
-            </a>
-        </div>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-inner">
+            <div class="sidebar-header">
+                <a class="logo" href="/">
+                    <div class="logo-icon">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5">
+                            <circle cx="11" cy="11" r="8"/>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+                    </div>
+                    <span class="logo-text"><span class="logo-letter">Z</span>yven</span>
+                </a>
+            </div>
 
-        {% block sidebar_top %}
-        <a class="new-research-btn" href="/">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="12" y1="5" x2="12" y2="19" />
-                <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
-            New Research
-        </a>
-        {% endblock %}
-
-        <div class="sidebar-middle">
-            {% block sidebar_middle %}{% endblock %}
-        </div>
-
-        <div class="sidebar-footer">
-            <a class="nav-btn {% block memory_nav_active %}{% endblock %}" href="/memory/">
+            {% block sidebar_top %}
+            <a class="new-research-btn" href="/">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z" />
-                    <path d="M12 8v4l3 3" />
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
                 </svg>
-                Memory Viewer
+                New Research
             </a>
+            {% endblock %}
+
+            <div class="sidebar-middle">
+                {% block sidebar_middle %}{% endblock %}
+            </div>
+
+            <div class="sidebar-footer">
+                <a class="nav-btn {% block memory_nav_active %}{% endblock %}" href="/memory/">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z" />
+                        <path d="M12 8v4l3 3" />
+                    </svg>
+                    Memory Viewer
+                </a>
+            </div>
         </div>
+
+        <!-- Toggle sits inside sidebar so it slides with it -->
+        <button class="sidebar-toggle" id="sidebar-toggle" onclick="toggleSidebar()" title="Toggle sidebar">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="3" y1="6" x2="21" y2="6"/>
+                <line x1="3" y1="12" x2="21" y2="12"/>
+                <line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+        </button>
     </aside>
+
+    <!-- Collapsed toggle — only visible when sidebar is closed -->
+    <button class="collapsed-toggle" id="collapsed-toggle" onclick="toggleSidebar()" title="Open sidebar" style="
+        display: none;
+        position: fixed;
+        top: 18px;
+        left: 12px;
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: var(--sidebar-bg);
+        color: var(--text-muted);
+        cursor: pointer;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+        transition: background 0.2s, color 0.2s, border-color 0.2s;
+    ">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <line x1="3" y1="12" x2="21" y2="12"/>
+            <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+    </button>
 
     <main class="main">
         {% block main_content %}{% endblock %}
     </main>
+
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const collapsedToggle = document.getElementById('collapsed-toggle');
+
+        let isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+
+        function applyState(animate) {
+            if (!animate) sidebar.style.transition = 'none';
+            if (isCollapsed) {
+                sidebar.classList.add('collapsed');
+                collapsedToggle.style.display = 'flex';
+            } else {
+                sidebar.classList.remove('collapsed');
+                collapsedToggle.style.display = 'none';
+            }
+            if (!animate) {
+                // Force reflow then re-enable transition
+                sidebar.offsetHeight;
+                sidebar.style.transition = '';
+            }
+        }
+
+        function toggleSidebar() {
+            isCollapsed = !isCollapsed;
+            localStorage.setItem('sidebarCollapsed', isCollapsed);
+            applyState(true);
+        }
+
+        // Apply instantly on load — no animation flash
+        applyState(false);
+    </script>
 
     {% block scripts %}{% endblock %}
 
