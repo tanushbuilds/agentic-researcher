@@ -1,6 +1,6 @@
 # 🔍 Zyven - Agentic Research Assistant
 
-A multi-node agentic research assistant powered by Google Gemini API. Give it any topic and it intelligently classifies complexity, selects tools, searches multiple sources, rewrites failed queries, remembers past research, and generates a full structured 5000+ word report — entirely for free.
+A multi-node agentic research assistant powered by a modular LLM provider system. Give it any topic and it intelligently classifies complexity, selects tools, searches multiple sources, rewrites failed queries, remembers past research, and generates a full structured 5000+ word report — entirely for free.
 
 ---
 
@@ -82,20 +82,31 @@ flowchart TD
 
 ---
 
-## Model Strategy
+## Modular LLM Provider System
 
-| Node Type | Model | Why |
+All nodes use a centralised `llm_client.py` module — no provider logic lives inside individual nodes. Switching providers requires changing a single line in `.env`.
+
+```
+ACTIVE_PROVIDER=gemini   # or groq
+```
+
+| Provider | Fast Model | Smart Model | RPD |
+|---|---|---|---|
+| `gemini` | `gemini-2.5-flash` | `gemini-2.5-flash` | 20 (free tier) |
+| `groq` | `llama-3.1-8b-instant` | `llama-3.3-70b-versatile` | Generous free tier |
+
+Nodes are split into two tiers:
+
+| Tier | Nodes | Why |
 |---|---|---|
-| Extraction, Reporter, Synthesiser | `gemini-2.5-flash` | Best quality for heavy tasks |
-| Classifier, Router, Reflector, Planner, Tool Selector, Memory | `gemini-2.5-flash-lite` | Fast, reliable, low token usage |
-
-All nodes use the OpenAI-compatible Gemini endpoint — no Ollama, no local GPU required.
+| `fast` | Classifier, Router, Reflector, Planner, Tool Selector, Memory | Short outputs, low token usage |
+| `smart` | Extraction, Synthesiser, Reporter | Heavy tasks requiring depth and quality |
 
 ---
 
 ## Performance
 
-| | Before (Mistral local) | After (Gemini API) |
+| | Before (Mistral local) | After (Cloud API) |
 |---|---|---|
 | Speed | 5–10 mins | Under 2 mins |
 | Report length | 500 words | 5000+ words |
@@ -107,7 +118,7 @@ All nodes use the OpenAI-compatible Gemini endpoint — no Ollama, no local GPU 
 ## Requirements
 
 - Python 3.9+
-- Google AI Studio API key (free, no credit card)
+- API key for at least one supported provider (Google AI Studio or Groq)
 - Internet connection
 
 ---
@@ -125,14 +136,19 @@ cd agentic-researcher
 pip install openai python-dotenv wikipedia-api wikipedia ddgs
 ```
 
-**3. Add your API key**
-
-Get a free API key from [aistudio.google.com](https://aistudio.google.com) — no credit card required.
+**3. Add your API keys**
 
 Create a `.env` file in the project root:
 ```
-GEMINI_API_KEY=your_api_key_here
+ACTIVE_PROVIDER=gemini
+
+GEMINI_API_KEY=your_gemini_key_here
+GROQ_API_KEY=your_groq_key_here
 ```
+
+Get a free Gemini key at [aistudio.google.com](https://aistudio.google.com) — no credit card required.
+
+Get a free Groq key at [console.groq.com](https://console.groq.com) — no credit card required.
 
 **4. Run**
 ```bash
@@ -141,25 +157,37 @@ python main.py
 
 ---
 
+## Switching Providers
+
+To switch from Gemini to Groq (or back), change one line in `.env`:
+
+```
+ACTIVE_PROVIDER=groq
+```
+
+Restart the server. Every node switches instantly — no code changes required.
+
+---
+
 ## Example Output
 
 ```
-Enter your research topic: Lionel Messi
+Enter your research topic: Virat Kohli
 
 Query Complexity: SIMPLE
 Tool selected: Both
 Searching Wikipedia and DuckDuckGo...
 
-Memory saved for: 'Lionel Messi'
+Memory saved for: 'Virat Kohli'
 
 === FINAL REPORT ===
-# Lionel Andrés Messi: A Comprehensive Analysis...
+# Comprehensive Research Report: The Illustrious Career of Virat Kohli...
 [5000+ word report generated in under 2 minutes]
 
 --- Second run ---
 
-Enter your research topic: Messi career
-Memory match found: 'Lionel Messi'! Skipping search...
+Enter your research topic: Kohli cricket career
+Memory match found: 'Virat Kohli'! Skipping search...
 ```
 
 ---
@@ -178,12 +206,14 @@ Memory match found: 'Lionel Messi'! Skipping search...
 | Semantic memory across sessions | ✅ |
 | Error handling with fallbacks | ✅ |
 | Cloud LLM inference (no GPU needed) | ✅ |
+| Modular provider switching via .env | ✅ |
 
 ---
 
 ## Built With
 
-- [Google Gemini API](https://ai.google.dev/) — Cloud LLM inference
+- [Google Gemini API](https://ai.google.dev/) — Primary LLM provider
+- [Groq](https://groq.com/) — Fallback LLM provider
 - [OpenAI Python SDK](https://github.com/openai/openai-python) — OpenAI-compatible client
 - [Wikipedia-API](https://pypi.org/project/Wikipedia-API/) — Wikipedia page fetching
 - [wikipedia](https://pypi.org/project/wikipedia/) — Wikipedia candidate search
@@ -195,7 +225,6 @@ Memory match found: 'Lionel Messi'! Skipping search...
 
 - [ ] PDF export of reports
 - [ ] LangGraph implementation
-- [ ] Web UI improvements
 
 ---
 
