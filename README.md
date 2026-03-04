@@ -170,7 +170,9 @@ Memory match found: 'Compare careers of Cristiano Ronaldo and Lionel Messi'! Ski
 
 ## Roadmap
 
+- [ ] PDF export of reports
 - [ ] LangGraph implementation
+- [ ] Web UI improvements
 
 ---
 
