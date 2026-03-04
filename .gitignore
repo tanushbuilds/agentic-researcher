@@ -36,9 +36,6 @@ build/
 # PyCharm
 .idea/
 
-# Ollama (local model cache, optional)
-ollama/models/
-
 # Temporary files
 *.tmp
 *.swp
