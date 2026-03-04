@@ -1,14 +1,6 @@
-import os
-from openai import OpenAI
-from dotenv import load_dotenv
 from agent_state import AgentState
+from llm_client import call_llm
 
-load_dotenv()
-
-client = OpenAI(
-    api_key=os.getenv("GEMINI_API_KEY"),
-    base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
-)
 
 def extraction_node(state: AgentState) -> AgentState:
     text_to_summarize = "\n\n".join(state.get("search_results", []))
@@ -31,13 +23,7 @@ def extraction_node(state: AgentState) -> AgentState:
         {text_to_summarize}
         """
 
-        response = client.chat.completions.create(
-            model="gemini-2.5-flash",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.1,
-        )
-
-        summary = response.choices[0].message.content
+        summary = call_llm(prompt, mode="smart", temperature=0.1)
         state["extracted_notes"] = summary
 
     except Exception as e:

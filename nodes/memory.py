@@ -1,16 +1,8 @@
 import os
 import json
-from openai import OpenAI
-from dotenv import load_dotenv
 from datetime import datetime
 from agent_state import AgentState
-
-load_dotenv()
-
-client = OpenAI(
-    api_key=os.getenv("GEMINI_API_KEY"),
-    base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
-)
+from llm_client import call_llm
 
 
 def write_memory(state: AgentState) -> AgentState:
@@ -57,23 +49,14 @@ def read_memory(state: AgentState) -> AgentState:
                 Reply with ONLY the exact matching topic from the list, or NONE if no match.
                 """
 
-                response = client.chat.completions.create(
-                    model="gemini-2.5-flash-lite",
-                    messages=[{"role": "user", "content": prompt}],
-                    temperature=0.0,
-                    max_tokens=100
-                )
-
-                is_query_match = response.choices[0].message.content.strip()
+                is_query_match = call_llm(
+                    prompt, mode="fast", temperature=0.0, max_tokens=100
+                ).strip()
 
                 if is_query_match != "NONE" and is_query_match in memory:
                     state["extracted_notes"] = memory[is_query_match]["notes"]
                     state["memory_used"] = True
-
-                    print(
-                        f"\nMemory match found: '{is_query_match}'! Skipping search..."
-                    )
-
+                    print(f"\nMemory match found: '{is_query_match}'! Skipping search...")
                     return state
                 else:
                     print(f"\nNo memory match found. Proceeding with fresh search...")
