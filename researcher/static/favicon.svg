@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e1e1c"/>
+      <stop offset="100%" style="stop-color:#161614"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#d4806a"/>
+      <stop offset="100%" style="stop-color:#c8715a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background rounded square -->
+  <rect width="32" height="32" rx="8" fill="url(#bg)"/>
+
+  <!-- Subtle border -->
+  <rect width="32" height="32" rx="8" fill="none" stroke="rgba(200,113,90,0.25)" stroke-width="1"/>
+
+  <!-- Italic Z in Playfair style -->
+  <text
+    x="16"
+    y="23"
+    font-family="'Playfair Display', Georgia, serif"
+    font-size="22"
+    font-weight="700"
+    font-style="italic"
+    fill="url(#accent)"
+    text-anchor="middle"
+    dominant-baseline="auto"
+    letter-spacing="-1"
+  >Z</text>
+</svg>
