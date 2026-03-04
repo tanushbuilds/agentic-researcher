@@ -3,48 +3,70 @@
 {% block title %}Memory Viewer — Zyven{% endblock %}
 
 {% block extra_styles %}
+
+        /* ── Page Header ── */
         .page-header {
             padding: 24px 40px;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid var(--border-subtle);
             display: flex;
             align-items: center;
             justify-content: space-between;
+            background: rgba(0,0,0,0.08);
+        }
+
+        .page-title-wrap {}
+
+        .page-eyebrow {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--accent);
+            opacity: 0.7;
+            margin-bottom: 4px;
         }
 
         .page-title {
-            font-size: 16px;
-            font-weight: 600;
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 22px;
+            font-weight: 700;
             color: var(--text-primary);
-            letter-spacing: -0.2px;
+            letter-spacing: -0.3px;
+            line-height: 1.2;
         }
 
         .page-subtitle {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-muted);
-            margin-top: 2px;
+            margin-top: 4px;
+            letter-spacing: 0.1px;
         }
 
         .clear-btn {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 7px;
             padding: 8px 14px;
             border-radius: 8px;
-            border: 1px solid var(--error);
+            border: 1px solid rgba(184, 107, 101, 0.3);
             background: transparent;
             color: var(--error);
-            font-size: 13px;
+            font-size: 12.5px;
             cursor: pointer;
-            transition: all 0.15s;
+            transition: all 0.2s;
             font-family: inherit;
             text-decoration: none;
+            letter-spacing: -0.1px;
         }
 
         .clear-btn:hover {
             background: var(--error);
+            border-color: var(--error);
             color: white;
+            box-shadow: 0 4px 12px rgba(184, 107, 101, 0.25);
         }
 
+        /* ── Content ── */
         .content {
             flex: 1;
             overflow-y: auto;
@@ -53,40 +75,72 @@
             flex-direction: column;
         }
 
+        /* ── Empty State ── */
         .empty-state {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100%;
-            gap: 12px;
+            gap: 14px;
             color: var(--text-muted);
         }
 
         .empty-state svg {
-            opacity: 0.3;
+            opacity: 0.15;
         }
 
         .empty-state p {
-            font-size: 14px;
+            font-size: 13px;
+            opacity: 0.6;
+            letter-spacing: 0.1px;
         }
 
+        /* ── Memory Grid ── */
         .memory-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 14px;
         }
 
         .memory-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.018);
+            border: 1px solid var(--border-subtle);
             border-radius: 14px;
             padding: 20px;
-            transition: border-color 0.15s;
+            transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+            animation: cardIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+        }
+
+        .memory-card:nth-child(1) { animation-delay: 0.05s; }
+        .memory-card:nth-child(2) { animation-delay: 0.1s; }
+        .memory-card:nth-child(3) { animation-delay: 0.15s; }
+        .memory-card:nth-child(4) { animation-delay: 0.2s; }
+        .memory-card:nth-child(5) { animation-delay: 0.25s; }
+        .memory-card:nth-child(6) { animation-delay: 0.3s; }
+
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .memory-card:hover {
-            border-color: #4a4a48;
+            border-color: rgba(200, 113, 90, 0.2);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.25), 0 0 0 1px rgba(200,113,90,0.05);
+            transform: translateY(-1px);
+        }
+
+        /* Card accent bar on top */
+        .memory-card::before {
+            content: '';
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: var(--accent);
+            border-radius: 2px;
+            margin-bottom: 14px;
+            opacity: 0.5;
         }
 
         .card-header {
@@ -94,22 +148,23 @@
             align-items: flex-start;
             justify-content: space-between;
             gap: 12px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .card-query {
             font-size: 14px;
             font-weight: 500;
             color: var(--text-primary);
-            line-height: 1.4;
+            line-height: 1.45;
+            letter-spacing: -0.1px;
         }
 
         .delete-btn {
-            width: 28px;
-            height: 28px;
-            min-width: 28px;
+            width: 26px;
+            height: 26px;
+            min-width: 26px;
             border-radius: 6px;
-            border: none;
+            border: 1px solid transparent;
             background: transparent;
             color: var(--text-muted);
             cursor: pointer;
@@ -118,57 +173,76 @@
             justify-content: center;
             transition: all 0.15s;
             text-decoration: none;
+            opacity: 0.5;
         }
 
         .delete-btn:hover {
-            background: var(--error);
-            color: white;
+            background: rgba(184, 107, 101, 0.15);
+            border-color: rgba(184, 107, 101, 0.3);
+            color: var(--error);
+            opacity: 1;
         }
 
         .card-timestamp {
-            font-size: 11px;
+            font-size: 10.5px;
             color: var(--text-muted);
-            margin-bottom: 12px;
+            margin-bottom: 14px;
+            letter-spacing: 0.2px;
+            opacity: 0.7;
         }
 
         .card-notes {
-            font-family: inherit;
-            font-size: 13px;
+            font-size: 12.5px;
             color: var(--text-secondary);
-            line-height: 1.65;
+            line-height: 1.7;
             display: -webkit-box;
             -webkit-line-clamp: 4;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            opacity: 0.8;
         }
 
         .card-footer {
-            margin-top: 14px;
+            margin-top: 16px;
             padding-top: 12px;
-            border-top: 1px solid var(--border);
+            border-top: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         .card-badge {
-            font-size: 11px;
-            color: var(--text-muted);
-            background: var(--bg);
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: var(--accent);
+            background: var(--accent-dim);
             padding: 3px 8px;
-            border-radius: 6px;
-            border: 1px solid var(--border);
+            border-radius: 4px;
+            opacity: 0.8;
         }
+
+        .card-lines {
+            font-size: 10.5px;
+            color: var(--text-muted);
+            opacity: 0.5;
+        }
+
 {% endblock %}
 
 {% block memory_nav_active %}active{% endblock %}
 
 {% block main_content %}
         <div class="page-header">
-            <div>
+            <div class="page-title-wrap">
+                <div class="page-eyebrow">Research Cache</div>
                 <div class="page-title">Memory Viewer</div>
                 <div class="page-subtitle">{{ memory|length }} saved research {{ memory|length|pluralize:"topic,topics" }}</div>
             </div>
             {% if memory %}
             <a class="clear-btn" href="/memory/clear/">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="3 6 5 6 21 6" />
                     <path d="M19 6l-1 14H6L5 6" />
                     <path d="M10 11v6" />
@@ -187,8 +261,7 @@
                     <div class="card-header">
                         <div class="card-query">{{ entry.query }}</div>
                         <a class="delete-btn" href="/memory/delete/{{ key }}/" title="Delete">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <line x1="18" y1="6" x2="6" y2="18" />
                                 <line x1="6" y1="6" x2="18" y2="18" />
                             </svg>
@@ -198,13 +271,14 @@
                     <div class="card-notes">{{ entry.notes }}</div>
                     <div class="card-footer">
                         <span class="card-badge">Cached</span>
+                        <span class="card-lines">Research complete</span>
                     </div>
                 </div>
                 {% endfor %}
             </div>
             {% else %}
             <div class="empty-state">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
                     <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z" />
                     <path d="M12 8v4l3 3" />
                 </svg>
