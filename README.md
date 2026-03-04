@@ -1,6 +1,6 @@
 # 🔍 Zyven - Agentic Research Assistant
 
-A locally-running multi-node research agent powered by Mistral via Ollama. Give it any topic and it intelligently classifies complexity, selects tools, searches multiple sources, rewrites failed queries, remembers past research, and generates a full structured report — entirely on your own machine.
+A multi-node agentic research assistant powered by Google Gemini API. Give it any topic and it intelligently classifies complexity, selects tools, searches multiple sources, rewrites failed queries, remembers past research, and generates a full structured 5000+ word report — entirely for free.
 
 ---
 
@@ -82,11 +82,33 @@ flowchart TD
 
 ---
 
+## Model Strategy
+
+| Node Type | Model | Why |
+|---|---|---|
+| Extraction, Reporter, Synthesiser | `gemini-2.5-flash` | Best quality for heavy tasks |
+| Classifier, Router, Reflector, Planner, Tool Selector, Memory | `gemini-2.5-flash-lite` | Fast, reliable, low token usage |
+
+All nodes use the OpenAI-compatible Gemini endpoint — no Ollama, no local GPU required.
+
+---
+
+## Performance
+
+| | Before (Mistral local) | After (Gemini API) |
+|---|---|---|
+| Speed | 5–10 mins | Under 2 mins |
+| Report length | 500 words | 5000+ words |
+| Hardware required | 4GB VRAM minimum | None |
+| Cost | Free (local) | Free (API) |
+
+---
+
 ## Requirements
 
 - Python 3.9+
-- [Ollama](https://ollama.com/) running locally with Mistral pulled
-- Internet connection for Wikipedia and DuckDuckGo search
+- Google AI Studio API key (free, no credit card)
+- Internet connection
 
 ---
 
@@ -100,12 +122,16 @@ cd agentic-researcher
 
 **2. Install dependencies**
 ```bash
-pip install ollama wikipedia-api wikipedia ddgs
+pip install openai python-dotenv wikipedia-api wikipedia ddgs
 ```
 
-**3. Pull Mistral**
-```bash
-ollama pull mistral
+**3. Add your API key**
+
+Get a free API key from [aistudio.google.com](https://aistudio.google.com) — no credit card required.
+
+Create a `.env` file in the project root:
+```
+GEMINI_API_KEY=your_api_key_here
 ```
 
 **4. Run**
@@ -115,29 +141,25 @@ python main.py
 
 ---
 
-## Example
+## Example Output
 
 ```
-Enter your research topic: Compare careers of Cristiano Ronaldo and Lionel Messi
+Enter your research topic: Lionel Messi
 
-Query Complexity: COMPLEX
-Sub-queries: ['Ronaldo career stats', 'Messi career stats', 'Compare Ronaldo Messi careers']
-
+Query Complexity: SIMPLE
 Tool selected: Both
-Searching both tools...
-Combined Wikipedia and DuckDuckGo results!
+Searching Wikipedia and DuckDuckGo...
 
-[repeats for each sub-query]
-
-Memory saved for: 'Compare careers of Cristiano Ronaldo and Lionel Messi'
+Memory saved for: 'Lionel Messi'
 
 === FINAL REPORT ===
-...
+# Lionel Andrés Messi: A Comprehensive Analysis...
+[5000+ word report generated in under 2 minutes]
 
 --- Second run ---
 
-Enter your research topic: Ronaldo vs Messi
-Memory match found: 'Compare careers of Cristiano Ronaldo and Lionel Messi'! Skipping search...
+Enter your research topic: Messi career
+Memory match found: 'Lionel Messi'! Skipping search...
 ```
 
 ---
@@ -155,13 +177,14 @@ Memory match found: 'Compare careers of Cristiano Ronaldo and Lionel Messi'! Ski
 | Plan and Execute pattern | ✅ |
 | Semantic memory across sessions | ✅ |
 | Error handling with fallbacks | ✅ |
+| Cloud LLM inference (no GPU needed) | ✅ |
 
 ---
 
 ## Built With
 
-- [Ollama](https://ollama.com/) — Local LLM inference
-- [Mistral](https://mistral.ai/) — Language model
+- [Google Gemini API](https://ai.google.dev/) — Cloud LLM inference
+- [OpenAI Python SDK](https://github.com/openai/openai-python) — OpenAI-compatible client
 - [Wikipedia-API](https://pypi.org/project/Wikipedia-API/) — Wikipedia page fetching
 - [wikipedia](https://pypi.org/project/wikipedia/) — Wikipedia candidate search
 - [ddgs](https://pypi.org/project/ddgs/) — DuckDuckGo web search
@@ -170,7 +193,9 @@ Memory match found: 'Compare careers of Cristiano Ronaldo and Lionel Messi'! Ski
 
 ## Roadmap
 
+- [ ] PDF export of reports
 - [ ] LangGraph implementation
+- [ ] Web UI improvements
 
 ---
 
