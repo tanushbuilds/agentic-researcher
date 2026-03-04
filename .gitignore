@@ -44,4 +44,4 @@ ollama/models/
 *.swp
 
 # Memory files
-memory.json
+memory.json.env

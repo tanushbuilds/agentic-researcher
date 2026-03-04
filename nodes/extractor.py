@@ -1,35 +1,45 @@
-import ollama
+import os
+from openai import OpenAI
+from dotenv import load_dotenv
 from agent_state import AgentState
 
+load_dotenv()
+
+client = OpenAI(
+    api_key=os.getenv("GEMINI_API_KEY"),
+    base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+)
 
 def extraction_node(state: AgentState) -> AgentState:
     text_to_summarize = "\n\n".join(state.get("search_results", []))
-
+    print(text_to_summarize)
     try:
         prompt = f"""
-        You are extracting research notes about: "{state['query']}"
+        You are a research evidence extraction engine.
 
-        STRICT RULES:
-        - Extract ONLY facts directly about "{state['query']}"
-        - If the text contains ANYTHING unrelated to "{state['query']}", completely ignore it
-        - Do NOT comment on the format or structure of the text
-        - Do NOT say "you have provided" or "it appears" 
-        - Just extract the relevant facts as a clean numbered list
-        - If you find no relevant facts, say "No relevant information found"
+        Your task is to extract **all relevant information** about "{state['query']}" from the provided text. 
+        Nothing should be removed, summarized, or shortened — preserve full depth, context, dates, statistics, awards, achievements, controversies, criticisms, and personal details if available.
+
+        CRITICAL INSTRUCTIONS:
+
+        - Include **everything** relevant; do NOT compress or remove information.
+        - Each fact gets its own line. If a paragraph contains multiple facts, create multiple lines.
+        - Include dates, numbers, stats, awards, records, clubs, teams, controversies, and personal life details.
+        - Only exclude content that is **clearly unrelated** to "{state['query']}".
 
         Text:
         {text_to_summarize}
         """
 
-        response = ollama.chat(
-            model="mistral", messages=[
-                {"role": "system", "content": "You are a precise research analyst. You extract only the most relevant facts from provided text, ignoring anything unrelated to the topic."},
-                {"role": "user", "content": prompt}],
-            options={"temperature": 0.1}
+        response = client.chat.completions.create(
+            model="gemini-2.5-flash",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.1,
         )
 
-        summary = response["message"]["content"]
+        summary = response.choices[0].message.content
         state["extracted_notes"] = summary
+
     except Exception as e:
         print(f"\nError in extraction_node: {e}")
         state["extracted_notes"] = "No notes extracted."

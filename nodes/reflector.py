@@ -1,5 +1,14 @@
-import ollama
+import os
+from openai import OpenAI
+from dotenv import load_dotenv
 from agent_state import AgentState
+
+load_dotenv()
+
+client = OpenAI(
+    api_key=os.getenv("GEMINI_API_KEY"),
+    base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+)
 
 
 def reflector_node(state: AgentState) -> AgentState:
@@ -21,12 +30,14 @@ def reflector_node(state: AgentState) -> AgentState:
         Nothing else
         """
 
-        response = ollama.chat(
-            model="mistral", messages=[{"role": "user", "content": prompt}]
+        response = client.chat.completions.create(
+            model="gemini-2.5-flash-lite",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.0,
+            max_tokens=5
         )
 
-        report_approved = response["message"]["content"].strip()
-
+        report_approved = response.choices[0].message.content.strip()
         state["report_approved"] = True if report_approved == "APPROVED" else False
 
         if state["report_approved"]:

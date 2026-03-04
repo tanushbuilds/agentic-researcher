@@ -100,6 +100,7 @@ def run_agent(query: str, send=None) -> AgentState:
             else:
                 send("Both tools struggled, proceeding with what we have...")
 
+        print(state["search_results"])
         # Step 5 — extract and report
         state = extraction_node(state)
 
@@ -113,6 +114,7 @@ def run_agent(query: str, send=None) -> AgentState:
 
     if state["memory_used"]:
         send("Using cached memory! Skipping search...")
+        print(state["extracted_notes"])
         state = report_node(state)
 
     else:

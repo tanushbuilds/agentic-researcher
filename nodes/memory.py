@@ -1,8 +1,16 @@
-import ollama
-import json
 import os
+import json
+from openai import OpenAI
+from dotenv import load_dotenv
 from datetime import datetime
 from agent_state import AgentState
+
+load_dotenv()
+
+client = OpenAI(
+    api_key=os.getenv("GEMINI_API_KEY"),
+    base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+)
 
 
 def write_memory(state: AgentState) -> AgentState:
@@ -49,11 +57,14 @@ def read_memory(state: AgentState) -> AgentState:
                 Reply with ONLY the exact matching topic from the list, or NONE if no match.
                 """
 
-                response = ollama.chat(
-                    model="mistral", messages=[{"role": "user", "content": prompt}]
+                response = client.chat.completions.create(
+                    model="gemini-2.5-flash-lite",
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=0.0,
+                    max_tokens=100
                 )
 
-                is_query_match = response["message"]["content"].strip()
+                is_query_match = response.choices[0].message.content.strip()
 
                 if is_query_match != "NONE" and is_query_match in memory:
                     state["extracted_notes"] = memory[is_query_match]["notes"]

@@ -1,12 +1,20 @@
-import ollama
+import os
+from openai import OpenAI
+from dotenv import load_dotenv
 from agent_state import AgentState
+
+load_dotenv()
+
+client = OpenAI(
+    api_key=os.getenv("GEMINI_API_KEY"),
+    base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+)
 
 
 def tool_selector_node(state: AgentState) -> AgentState:
     query = state["query"]
 
     try:
-
         prompt = f"""
         Decide the best search tool for the following research query.
 
@@ -24,11 +32,14 @@ def tool_selector_node(state: AgentState) -> AgentState:
         Output only a single word: WIKIPEDIA, DUCKDUCKGO, or BOTH.
         """
 
-        response = ollama.chat(
-            model="mistral", messages=[{"role": "user", "content": prompt}]
+        response = client.chat.completions.create(
+            model="gemini-2.5-flash-lite",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.0,
+            max_tokens=5
         )
 
-        tool = response["message"]["content"].strip().upper()
+        tool = response.choices[0].message.content.strip().upper()
 
         if "BOTH" in tool:
             state["selected_tool"] = "both"
@@ -39,6 +50,7 @@ def tool_selector_node(state: AgentState) -> AgentState:
         else:
             state["selected_tool"] = "wikipedia"
             print("\nTool selected: Wikipedia")
+
     except Exception as e:
         print(f"\nError in tool_selector: {e}")
         state["selected_tool"] = "duckduckgo"
