@@ -1,28 +1,32 @@
-import ollama
+from llm_client import call_llm
 from agent_state import AgentState
 
+SYNTHESIS_FORMAT = """
+Combine all facts into compact format, one entity/topic per line:
+BAD:  "Ronaldo is a famous footballer who has scored many goals throughout his career"
+GOOD: "Ronaldo | 41 years old | Portugal | 965 goals | 5 Ballon d'Or"
+
+- Merge duplicate facts across sources
+- Keep ALL unique details, nothing dropped
+- No prose, no commentary, just compact fact strings
+"""
 
 def synthesiser_node(state: AgentState) -> AgentState:
     try:
         prompt = f"""
-        You are a research synthesiser.
-        Your job is to combine and synthesise a list of extracted notes from each sub-query.
-        Here is the list of extracted notes from each sub-query: {state["sub_query_results"]}.
-        These are research findings from multiple sub-queries. Synthesise them into one unified set of notes, preserving all key information.
+        You are a research synthesiser for the topic: "{state['query']}"
+
+        {SYNTHESIS_FORMAT}
+
+        Extracted notes from each sub-query:
+        {state["sub_query_results"]}
         """
 
-        response = ollama.chat(
-            model="mistral", messages=[
-                {"role": "system", "content": "You are a research synthesiser. You combine findings from multiple sources into a single coherent, well-organised set of notes without losing any key information."},
-                {"role": "user", "content": prompt}],
-            options={"temperature": 0.1}
-        )
+        response = call_llm(prompt, "smart", temperature=0.1)
+        state["extracted_notes"] = response.strip()
 
-        synthesised_notes = response["message"]["content"].strip()
-        state["extracted_notes"] = synthesised_notes
     except Exception as e:
         print(f"\nError in synthesiser_node: {e}")
-        print("\nJoining sub-query results directly...")
         state["extracted_notes"] = "\n".join(state["sub_query_results"])
 
     return state

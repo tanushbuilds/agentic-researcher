@@ -1,15 +1,23 @@
-import ollama
+from llm_client import call_llm
 from agent_state import AgentState
 
 
 def report_node(state: AgentState) -> AgentState:
-    notes = "\n\n".join([state.get("extracted_notes", "")])
+    extracted_notes = state.get("extracted_notes", "")
+
+    # Handle both list and string formats
+    if isinstance(extracted_notes, list):
+        notes = "\n\n".join(extracted_notes)
+    else:
+        notes = extracted_notes
 
     try:
         prompt = f"""
         You are a professional research report writer.
 
-        Write a complete, well-structured research report in clean Markdown format.
+        Write a COMPREHENSIVE and DETAILED research report in clean Markdown format.
+        You MUST include ALL information from the research notes below — do not omit, summarize, or skip any detail.
+        The report should be as long as necessary to cover every piece of information thoroughly.
 
         IMPORTANT FORMATTING RULES:
         - Use # for the main title
@@ -26,30 +34,27 @@ def report_node(state: AgentState) -> AgentState:
         # Clear and Concise Report Title
 
         ## Introduction
-        Provide a brief overview of the topic and context.
+        Provide a detailed overview of the topic and full context.
 
         ## Key Findings
-        Present the most important findings as structured bullet points with short explanations.
+        Cover every finding from the notes. Do not skip anything.
 
         ## Analysis
-        Provide deeper explanation, interpretation, and connections between findings.
+        Provide deep explanation, interpretation, and connections between ALL findings.
 
         ## Conclusion
-        Summarize the insights and provide a clear closing statement.
+        Summarize all insights with a clear closing statement.
 
-        Research Notes:
+        ---
+        RESEARCH NOTES (use ALL of this information):
         {notes}
+        ---
         """
 
-        response = ollama.chat(
-            model="mistral", messages=[
-                {"role": "system", "content": "You are a professional research report writer. You write clear, structured, and detailed research reports based on provided notes."},
-                {"role": "user", "content": prompt}],
-            options={"temperature": 0.1}
-        )
+        response = call_llm(prompt, "smart", temperature=0.1)
 
-        report = response["message"]["content"]
-        state["final_report"] = report
+        state["final_report"] = response.strip()
+
     except Exception as e:
         print(f"\nError in report_node: {e}")
         state["final_report"] = "Report generation failed."

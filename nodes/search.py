@@ -1,4 +1,4 @@
-import ollama
+from llm_client import call_llm
 import wikipediaapi
 import wikipedia
 from agent_state import AgentState
@@ -29,11 +29,9 @@ def get_best_title(query: str, candidates: list) -> str:
         Reply with ONLY the title, nothing else.
         """
 
-        response = ollama.chat(
-            model="mistral", messages=[{"role": "user", "content": prompt}]
-        )
+        response = call_llm(prompt, "fast").strip()
 
-        return response["message"]["content"].strip()
+        return response.strip()
     except Exception as e:
         print(f"\nError in get_best_title: {e}")
         return candidates[0]  # fallback to first candidate
@@ -63,13 +61,13 @@ def search_node(state: AgentState) -> AgentState:
 
         if page.exists():
             print(f"\nPage found!")
-            state["wikipedia_results"] = [page.text[:750]]
+            state["wikipedia_results"] = [page.text]
         else:
             # Fallback — just use the first candidate
             print(f"\nLLM pick not found, using first candidate: '{candidates[0]}'")
             page = wiki_wiki.page(candidates[0])
             if page.exists():
-                state["wikipedia_results"] = [page.text[:750]]
+                state["wikipedia_results"] = [page.text]
             else:
                 state["wikipedia_results"] = ["No results found."]
     except Exception as e:

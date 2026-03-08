@@ -17,7 +17,7 @@ def duckduckgo_node(state: AgentState) -> AgentState:
         # Combine the body text from top results
         combined = "\n\n".join(
             [
-                f"Source: {r['href']}\n{r['body'][:150]}"
+                f"Source: {r['href']}\n{r['body']}"
                 for r in results
                 if r.get("body")
             ]
