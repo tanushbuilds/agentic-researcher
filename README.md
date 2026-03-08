@@ -8,13 +8,14 @@ A locally-running multi-node research agent powered by Gemini and Groq via their
 
 ```mermaid
 flowchart TD
-    A([🔍 User Query]) --> B[read_memory]
-    B -->|Match Found| C[report_node]
+    A([🔍 User Query]) --> F[planner_node]
+    F -->|Match Found| C[report_node]
     C --> E([📄 Final Report])
-    B -->|No Match| F[planner_node]
+    F -->|No Match| PS[parallel_search_node]
 
     F -->|SIMPLE| PS[parallel_search_node]
     F -->|COMPLEX| I[Sub-queries Loop]
+    I --> PS
     I --> PS
 
     PS --> J[search_node]
@@ -46,8 +47,7 @@ flowchart TD
 
 | Node | File | What it does |
 |---|---|---|
-| Memory (Read) | `nodes/memory.py` | Checks if query matches past research — skips search if yes |
-| Planner | `nodes/planner.py` | Classifies query as SIMPLE or COMPLEX, and breaks complex queries into focused sub-queries |
+| Planner | `nodes/planner.py` | Checks memory for past research; if none, classifies query and breaks complex ones into sub-queries |
 | Parallel Search | `nodes/parallel_search.py` | Triggers Wikipedia and DuckDuckGo searches simultaneously |
 | Search | `nodes/search.py` | Fetches Wikipedia page using LLM-based candidate matching |
 | DuckDuckGo | `nodes/duckduckgo.py` | Searches the web for recent or practical topics |
@@ -147,6 +147,7 @@ Memory match found: 'Compare careers of Cristiano Ronaldo and Lionel Messi'! Ski
 
 - [ ] PDF export of reports
 - [ ] LangGraph implementation
+- [ ] Web UI improvements
 
 ---
 
